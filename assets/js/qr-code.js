@@ -1,337 +1,149 @@
-const video = document.getElementById("video");
-const canvas = document.getElementById("qrCanvas");
-const canvasContext = canvas.getContext("2d", {
-  willReadFrequently: true,
-});
-const resultElement = document.getElementById("result");
-const qrButton = document.getElementById("qrButton");
+document.addEventListener("DOMContentLoaded", function () {
+  const qrResult = document.getElementById("qr-result");
+  const startButton = document.getElementById("startButton");
+  const stopButton = document.getElementById("stopButton");
+  let html5QrCode = null;
+  let isScanning = false;
 
-let qrScanning = false;
-let mediaStream = null;
-
-const qrCodes = Array.from({ length: 250 }, (_, i) => i + 130000);
-
-// Binary search orqali QR kodni qidirish (O(log n) murakkablik)
-const findQRCode = (id) => {
-  let left = 0;
-  let right = qrCodes.length - 1;
-
-  while (left <= right) {
-    const mid = Math.floor((left + right) / 2);
-    const midValue = qrCodes[mid];
-
-    if (midValue === id) {
-      return {
-        found: true,
-        index: mid,
-        value: midValue,
-      };
-    }
-
-    if (midValue < id) {
-      left = mid + 1;
-    } else {
-      right = mid - 1;
-    }
+  if (!startButton || !stopButton || !qrResult) {
+    console.error("Kerakli elementlar topilmadi!");
+    return;
   }
 
-  return {
-    found: false,
-    nearestValue: qrCodes[left] || qrCodes[right],
-    nearestIndex: left || right,
-  };
-};
-
-// QR kodni tekshirish
-const validateQRCode = (code) => {
-  try {
-    console.log("QR kodni tekshirish boshlandi:", code);
-    if (isNaN(Number(code))) {
-      return {
-        isValid: false,
-        message: "QR kod raqam emas",
-      };
-    }
-
-    const searchResult = findQRCode(code);
-    if (searchResult.found) {
-      return {
-        isValid: true,
-        message: `QR kod tasdiqlandi: ${code}`,
-      };
-    } else {
-      return {
-        isValid: false,
-        message: `Noto'g'ri QR kod. Eng yaqin kod: ${searchResult.nearestValue}`,
-      };
-    }
-  } catch (error) {
-    console.error("QR kodni tekshirishda xatolik:", error);
-    return {
-      isValid: false,
-      message: "QR kodni tekshirishda xatolik yuz berdi",
-    };
-  }
-};
-
-window.addEventListener("beforeunload", () => {
-  if (mediaStream) {
-    mediaStream.getTracks().forEach((track) => track.stop());
-  }
-});
-
-qrButton.addEventListener("click", async () => {
-  try {
-    if (!qrScanning) {
-      await startQRScanning();
-      qrButton.textContent = "To'xtatish";
-      video.style.display = "block";
-    } else {
-      stopQRScanning();
-      qrButton.textContent = "QR Kodni Skanerlash";
-      video.style.display = "none";
-    }
-    qrScanning = !qrScanning;
-  } catch (error) {
-    console.error("QR skanerlashda xatolik:", error);
-    updateResultMessage(
-      resultElement,
-      "QR skanerlashda xatolik yuz berdi: " + error.message,
-      false
-    );
-  }
-});
-
-async function startQRScanning() {
-  try {
-    console.log("Kamera ruxsati so'ralmoqda...");
-
-    if (mediaStream) {
-      mediaStream.getTracks().forEach((track) => track.stop());
-    }
-
-    try {
-      mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: { exact: "environment" },
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-        },
-      });
-    } catch (error) {
-      // Agar orqa kamera ishlamasa, old kamerani ishlatamiz
-      console.log("Orqa kamera ishlamadi, old kamerani sinab ko'ramiz");
-      mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: "user",
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-        },
-      });
-    }
-
-    console.log("Kamera ruxsati olindi");
-
-    video.srcObject = mediaStream;
-    video.setAttribute("playsinline", true);
-
-    // Video elementining tayyor bo'lishini kutish
-    await new Promise((resolve) => {
-      video.onloadedmetadata = () => {
-        console.log("Video metadata yuklandi");
-        resolve();
-      };
-    });
-
-    await video.play();
-    console.log("Video ijro etilmoqda");
-
-    // Canvas o'lchamlarini video o'lchamlariga moslashtirish
-    canvas.width = video.videoWidth || 640;
-    canvas.height = video.videoHeight || 480;
-    console.log("Canvas o'lchamlari:", canvas.width, "x", canvas.height);
-
-    requestAnimationFrame(tick);
-    return true;
-  } catch (error) {
-    console.error("Kamerani ishga tushirishda xatolik:", error);
-
-    let errorMessage = "Kamerani ishga tushirishda xatolik yuz berdi";
-    if (error.name === "NotAllowedError") {
-      errorMessage = "Kameradan foydalanish uchun ruxsat berilmadi";
-    } else if (error.name === "NotFoundError") {
-      errorMessage = "Kamera topilmadi";
-    } else if (error.name === "NotReadableError") {
-      errorMessage = "Kamera band yoki ishlamayapti";
-    } else if (error.name === "OverconstrainedError") {
-      errorMessage = "Kamera parametrlari qo'llab-quvvatlanmaydi";
-      // Eng oddiy parametrlar bilan qayta urinib ko'ramiz
+  async function initializeScanner() {
+    if (!html5QrCode) {
       try {
-        mediaStream = await navigator.mediaDevices.getUserMedia({
-          video: true,
-        });
-        console.log("Kamera oddiy parametrlar bilan ishga tushdi");
-        video.srcObject = mediaStream;
-        video.setAttribute("playsinline", true);
-        await video.play();
-        canvas.width = video.videoWidth || 640;
-        canvas.height = video.videoHeight || 480;
-        requestAnimationFrame(tick);
-        return true;
-      } catch (retryError) {
-        console.error("Qayta urinishda ham xatolik:", retryError);
+        html5QrCode = new Html5Qrcode("reader");
+      } catch (error) {
+        console.error("Scanner yaratishda xatolik:", error);
+        showError("QR skanner yaratishda xatolik yuz berdi");
+        return false;
       }
     }
-
-    updateResultMessage(resultElement, errorMessage, false);
-    throw error;
-  }
-}
-
-function stopQRScanning() {
-  console.log("QR skanerlash to'xtatilmoqda...");
-
-  if (mediaStream) {
-    mediaStream.getTracks().forEach((track) => {
-      track.stop();
-      console.log("Kamera to'xtatildi");
-    });
-    mediaStream = null;
+    return true;
   }
 
-  video.srcObject = null;
-  updateResultMessage(resultElement, "", false);
-}
-
-function tick() {
-  if (!qrScanning) return;
-
-  if (video.readyState === video.HAVE_ENOUGH_DATA) {
+  async function startScanning() {
     try {
-      // Canvas o'lchamlarini video o'lchamlariga moslashtirish
-      if (
-        canvas.width !== video.videoWidth ||
-        canvas.height !== video.videoHeight
-      ) {
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        console.log(
-          "Canvas o'lchamlari yangilandi:",
-          canvas.width,
-          "x",
-          canvas.height
-        );
+      if (!(await initializeScanner())) {
+        return;
       }
 
-      // Video kadrni canvasga chizish
-      canvasContext.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const config = {
+        fps: 10,
+        qrbox: { width: 250, height: 250 },
+        aspectRatio: 1.0,
+      };
 
-      // Debug uchun canvas ko'rsatish
-      canvas.style.display = "block";
-      canvas.style.position = "fixed";
-      canvas.style.top = "10px";
-      canvas.style.right = "10px";
-      canvas.style.width = "200px";
-      canvas.style.height = "150px";
-      canvas.style.border = "2px solid red";
-      canvas.style.zIndex = "9999";
-
-      // Rasm ma'lumotlarini olish
-      const imageData = canvasContext.getImageData(
-        0,
-        0,
-        canvas.width,
-        canvas.height
+      await html5QrCode.start(
+        { facingMode: "environment" },
+        config,
+        onScanSuccess,
+        onScanError
       );
 
-      console.log("Rasm ma'lumotlari:", {
-        width: imageData.width,
-        height: imageData.height,
-        dataLength: imageData.data.length,
-        hasData: imageData.data.some((x) => x !== 0),
-      });
-
-      // QR kodni aniqlash
-      const code = jsQR(imageData.data, imageData.width, imageData.height, {
-        inversionAttempts: "attemptBoth",
-        grayscaleWeights: {
-          red: 0.299,
-          green: 0.587,
-          blue: 0.114,
-          useIntegerApproximation: false,
-        },
-      });
-
-      if (code) {
-        console.log("QR kod ma'lumotlari:", {
-          data: code.data,
-          location: code.location,
-          numBits: code.numBits,
-        });
-
-        // QR kod topilgan joyni belgilash
-        canvasContext.beginPath();
-        canvasContext.moveTo(
-          code.location.topLeftCorner.x,
-          code.location.topLeftCorner.y
-        );
-        canvasContext.lineTo(
-          code.location.topRightCorner.x,
-          code.location.topRightCorner.y
-        );
-        canvasContext.lineTo(
-          code.location.bottomRightCorner.x,
-          code.location.bottomRightCorner.y
-        );
-        canvasContext.lineTo(
-          code.location.bottomLeftCorner.x,
-          code.location.bottomLeftCorner.y
-        );
-        canvasContext.lineTo(
-          code.location.topLeftCorner.x,
-          code.location.topLeftCorner.y
-        );
-        canvasContext.lineWidth = 4;
-        canvasContext.strokeStyle = "#FF3B58";
-        canvasContext.stroke();
-
-        const validation = validateQRCode(code.data);
-        updateResultMessage(
-          resultElement,
-          validation.message,
-          validation.isValid
-        );
-
-        if (validation.isValid) {
-          stopQRScanning();
-          qrButton.textContent = "QR Kodni Skanerlash";
-          qrScanning = false;
-          video.style.display = "none";
-          canvas.style.display = "none";
-        } else {
-          requestAnimationFrame(tick);
-        }
-      } else {
-        console.log("QR kod topilmadi");
-        requestAnimationFrame(tick);
-      }
-    } catch (error) {
-      console.error("Kadrni qayta ishlashda xatolik:", error);
-      requestAnimationFrame(tick);
+      isScanning = true;
+      startButton.style.display = "none";
+      stopButton.style.display = "inline-block";
+      qrResult.style.display = "block";
+      qrResult.innerHTML = `
+        <div class="alert alert-info">
+          QR kodni kameraga ko'rsating...
+        </div>
+      `;
+    } catch (err) {
+      console.error("Asosiy xatolik:", err);
+      showError(getErrorMessage(err));
     }
-  } else {
-    console.log("Video tayyor emas:", video.readyState);
-    requestAnimationFrame(tick);
   }
-}
 
-function updateResultMessage(element, text, isSuccess) {
-  element.textContent = text;
-  if (text) {
-    element.classList.remove("d-none");
-    element.classList.remove("alert-success", "alert-danger");
-    element.classList.add(isSuccess ? "alert-success" : "alert-danger");
-  } else {
-    element.classList.add("d-none");
+  function onScanSuccess(decodedText, decodedResult) {
+    if (html5QrCode && isScanning) {
+      html5QrCode
+        .stop()
+        .then(() => {
+          isScanning = false;
+          startButton.style.display = "inline-block";
+          stopButton.style.display = "none";
+
+          // Natijani ko'rsatish
+          qrResult.style.display = "block";
+          qrResult.innerHTML = `
+          <div class="alert alert-success">
+            <h4 class="alert-heading">QR Kod O'qildi!</h4>
+            <p class="mb-0"><strong>Natija:</strong> ${decodedText}</p>
+          </div>
+        `;
+
+          // Ovozli signal
+          try {
+            const audio = new Audio(
+              "data:audio/wav;base64,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qJrx4KOQjahZxWbcZgztj2c49nKmkId44S71j0c8eV9yDK6uPRzx5X18eDvjvQ6yKo9ZSS6l//8elePK/Lf//IInrOF/FvDoADYAGBMGb7FtErm5MXMlmPAJQVgWta7Zx2go+8xJ0UiCb8LHHdftWyLJE0QIAIsI+UbXu67dZMjmgDGCGl1H+vpF4NSDckSIkk7Vd+sxEhBQMRU8j/12UIRhzSaUdQ+rQU5kGeFxm+hb1oh6pWWmv3uvmReDl0UnvtapVaIzo1jZbf/pD6ElLqSX+rUmOQNpJFa/r+sa4e/pBlAABoAAAAA3CUgShLdGIxsY7AUABPRrgCABdDuQ5GC7DqPQCgbbJUAoRSUj+NIEig0YfyWUho1VBBBA//uQZB4ABZx5zfMakeAAAAmwAAAAF5F3P0w9GtAAACfAAAAAwLhMDmAYWMgVEG1U0FIGCBgXBXAtfMH10000EEEEEECUBYln03TTTdNBDZopopYvrTTdNa325mImNg3TTPV9q3pmY0xoO6bv3r00y+IDGid/9aaaZTGMuj9mpu9Mpio1dXrr5HERTZSmqU36A3CumzN/9Robv/Xx4v9ijkSRSNLQhAWumap82WRSBUqXStV/YcS+XVLnSS+WLDroqArFkMEsAS+eWmrUzrO0oEmE40RlMZ5+ODIkAyKAGUwZ3mVKmcamcJnMW26MRPgUw6j+LkhyHGVGYjSUUKNpuJUQoOIAyDvEyG8S5yfK6dhZc0Tx1KI/gviKL6qvvFs1+bWtaz58uUNnryq6kt5RzOCkPWlVqVX2a/EEBUdU1KrXLf40GoiiFXK///qpoiDXrOgqDR38JB0bw7SoL+ZB9o1RCkQjQ2CBYZKd/+VJxZRRZlqSkKiws0WFxUyCwsKiMy7hUVFhIaCrNQsKkTIsLivwKKigsj8XYlwt/WKi2N4d//uQRCSAAjURNIHpMZBGYiaQPSYyAAABLAAAAAAAACWAAAAApUF/Mg+0aohSIRobBAsMlO//Kk4soosy1JSFRYWaLC4qZBYWFRGZdwqKiwkNBVmoWFSJkWFxX4FFRQWR+LsS4W/rFRb/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////VEFHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAU291bmRib3kuZGUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMjAwNGh0dHA6Ly93d3cuc291bmRib3kuZGUAAAAAAAAAACU="
+            );
+            audio.play();
+          } catch (error) {
+            console.log("Ovozli signal ishlamadi");
+          }
+        })
+        .catch((error) => {
+          console.error("Kamerani to'xtatishda xatolik:", error);
+          showError("Kamerani to'xtatishda xatolik yuz berdi");
+        });
+    }
   }
-}
+
+  function onScanError(errorMessage) {
+    if (!errorMessage.includes("No MultiFormat Readers")) {
+      console.log("Skanerlash xatosi:", errorMessage);
+    }
+  }
+
+  function stopScanning() {
+    if (html5QrCode && isScanning) {
+      html5QrCode
+        .stop()
+        .then(() => {
+          isScanning = false;
+          startButton.style.display = "inline-block";
+          stopButton.style.display = "none";
+          qrResult.style.display = "none";
+        })
+        .catch((err) => {
+          showError("Kamerani to'xtatishda xatolik: " + err.message);
+        });
+    }
+  }
+
+  function getErrorMessage(err) {
+    switch (err.name) {
+      case "NotAllowedError":
+        return "Kameradan foydalanish uchun ruxsat berilmadi. Iltimos, brauzer sozlamalaridan kameraga ruxsat bering.";
+      case "NotFoundError":
+        return "Kamera topilmadi. Iltimos, kamera mavjudligini tekshiring.";
+      case "NotReadableError":
+        return "Kameraga ulanib bo'lmadi. Kamera boshqa dastur tomonidan band bo'lishi mumkin.";
+      case "SecurityError":
+        return "Xavfsizlik xatosi. Iltimos, HTTPS protokolidan foydalaning.";
+      default:
+        return (
+          "Kamerani ishga tushirishda xatolik: " +
+          (err.message || "Noma'lum xato")
+        );
+    }
+  }
+
+  function showError(message) {
+    console.error(message);
+    qrResult.style.display = "block";
+    qrResult.innerHTML = `
+      <div class="alert alert-danger">
+        <h4 class="alert-heading">Xatolik!</h4>
+        <p class="mb-0">${message}</p>
+      </div>
+    `;
+  }
+
+  startButton.addEventListener("click", startScanning);
+  stopButton.addEventListener("click", stopScanning);
+  window.addEventListener("beforeunload", stopScanning);
+});
