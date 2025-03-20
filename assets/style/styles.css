@@ -1,0 +1,80 @@
+/* Asosiy o'zgaruvchilar */
+:root {
+  --primary-color: #f8f9fa;
+  --secondary-color: #e9ecef;
+  --danger-color: #dc3545;
+  --border-radius-lg: 30px;
+  --border-radius-md: 15px;
+  --transition-speed: 0.3s;
+  --shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Asosiy stillar */
+body {
+  background: linear-gradient(
+    135deg,
+    var(--primary-color) 0%,
+    var(--secondary-color) 100%
+  );
+  min-height: 100vh;
+}
+
+/* Video elementlari uchun umumiy stillar */
+.video-container {
+  width: 70%;
+  height: 50vh;
+  margin: 0 auto;
+  border-radius: var(--border-radius-lg);
+}
+
+#faceContainer {
+  position: relative;
+  overflow: hidden;
+}
+
+#faceVideo,
+#video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: var(--border-radius-lg);
+  transition: all var(--transition-speed) ease;
+}
+
+#faceVideo {
+  border: 3px solid var(--danger-color);
+}
+
+#faceCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Autentifikatsiya kartalari */
+.auth-card {
+  background: rgba(255, 255, 255, 0.95);
+  border: none;
+  transition: all var(--transition-speed) ease;
+  cursor: pointer;
+}
+
+.auth-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow);
+}
+
+.auth-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+/* Responsive dizayn */
+@media (max-width: 768px) {
+  .video-container {
+    width: 90%;
+  }
+}
