@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="uz">
+  <head>
+    <title>Ishchilar</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="./assets/packs/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="./assets/packs/css/font.css" rel="stylesheet" />
+    <link href="./assets/packs/css/bootstrap-icons.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="./assets/style/workers.css" />
+    <script src="./assets/packs/js/face-api.js"></script>
+    <script src="./assets/packs/js/qrcode.min.js"></script>
+    <script src="./assets/packs/js/qrcode1-4-4.min.js"></script>
+  </head>
+  <body class="py-5">
+    <button class="theme-toggle" id="themeToggle">🌓</button>
+    <div class="home-button">
+      <a href="index.html" class="btn btn-outline-primary">
+        <i class="fas fa-home"></i> O'rtaga qaytish
+      </a>
+    </div>
+    <div class="container">
+      <h1 class="text-center mb-5 fw-bold fade-in">Ishchilar</h1>
+
+      <div class="row justify-content-center mb-4">
+        <div class="col-lg-6">
+          <div class="search-box">
+            <input
+              type="text"
+              class="search-input"
+              placeholder="Qidirish..."
+              id="searchInput"
+            />
+            <i class="bi bi-search search-icon"></i>
+          </div>
+        </div>
+        <div class="col-lg-2 text-end">
+          <button class="btn btn-primary" onclick="showAddWorkerModal()">
+            <i class="bi bi-plus-lg"></i> Yangi ishchi
+          </button>
+        </div>
+      </div>
+
+      <div class="row" id="workersContainer">
+        <div class="col-12">
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Rasm</th>
+                  <th>F.I.O</th>
+                  <th>Lavozim</th>
+                  <th>Harbiy unvon</th>
+                  <th>QK turi</th>
+                  <th>Amallar</th>
+                </tr>
+              </thead>
+              <tbody id="workersTableBody">
+                <!-- Worker rows will be dynamically added here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="loading-spinner" id="loadingSpinner">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+
+      <div class="pagination-container" id="paginationContainer">
+        <button class="pagination-btn" id="prevBtn" disabled>
+          <i class="bi bi-chevron-left"></i> Oldingi
+        </button>
+        <span class="pagination-info" id="paginationInfo"></span>
+        <button class="pagination-btn" id="nextBtn">
+          Keyingi <i class="bi bi-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Add Worker Modal -->
+    <div
+      class="modal fade"
+      id="addWorkerModal"
+      tabindex="-1"
+      aria-labelledby="addWorkerModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addWorkerModalLabel">
+              Yangi ishchi qo'shish
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="addWorkerForm">
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="workerName" class="form-label">F.I.O</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="workerName"
+                    required
+                  />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="workerPosition" class="form-label">Lavozim</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="workerPosition"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="workerMilitaryRank" class="form-label"
+                    >Harbiy unvon</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="workerMilitaryRank"
+                    required
+                  />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="workerQKType" class="form-label">QK turi</label>
+                  <select class="form-select" id="workerQKType" required>
+                    <option value="QK-1">QK-1</option>
+                    <option value="QK-2">QK-2</option>
+                    <option value="QK-3">QK-3</option>
+                  </select>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="workerImage" class="form-label">Rasm</label>
+                <input
+                  type="file"
+                  class="form-control"
+                  id="workerImage"
+                  accept="image/*"
+                  required
+                />
+                <div id="imagePreview" class="mt-2 text-center"></div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Bekor qilish
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              onclick="saveNewWorker()"
+            >
+              Saqlash
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="./assets/packs/js/bootstrap.bundle.min.js"></script>
+    <script src="./assets/js/workers.js"></script>
+  </body>
+</html>

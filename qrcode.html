@@ -4,77 +4,80 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>QR Code Scanner</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <link href="./assets/packs/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="./assets/packs/js/html5-qrcode.min.js"></script>
+    <link rel="stylesheet" href="./assets/style/qr-code.css" />
     <style>
+      :root {
+        --bg-color: #ffffff;
+        --text-color: #333333;
+        --box-bg: #f8f9fa;
+        --result-bg: #f8f9fa;
+        --shadow-color: rgba(0, 0, 0, 0.1);
+      }
+
+      .dark-mode {
+        --bg-color: #1a1a1a;
+        --text-color: #ffffff;
+        --box-bg: #2d2d2d;
+        --result-bg: #2d2d2d;
+        --shadow-color: rgba(0, 0, 0, 0.3);
+      }
+
       body {
-        background-color: #121212;
-        color: white;
+        background-color: var(--bg-color);
+        color: var(--text-color);
         text-align: center;
         font-family: Arial, sans-serif;
       }
-      .container {
-        margin-top: 50px;
-        padding: 20px;
+
+      .home-button {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 1000;
       }
-      .qr-box {
-        padding: 20px;
-        background: #1e1e1e;
-        border-radius: 10px;
-        margin-bottom: 20px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      .home-button .btn {
+        padding: 8px 16px;
+        border-radius: 20px;
+        transition: all 0.3s ease;
+        background: rgba(255, 255, 255, 0.9);
       }
-      #reader {
-        width: 100%;
-        max-width: 400px;
-        margin: 20px auto;
-        border-radius: 10px;
-        overflow: hidden;
+      .dark-mode .home-button .btn {
+        background: rgba(45, 52, 54, 0.9);
+        color: #ffffff;
       }
-      #reader video {
-        border-radius: 10px;
+      .home-button .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       }
-      .btn {
-        margin: 5px;
-        padding: 10px 20px;
-      }
-      #qr-result {
-        margin-top: 15px;
-        padding: 10px;
-        border-radius: 5px;
-        background-color: rgba(255, 255, 255, 0.1);
-      }
-      .success {
-        color: #28a745;
-      }
-      .error {
-        color: #dc3545;
+      .dark-mode .home-button .btn:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
       }
     </style>
   </head>
   <body>
+    <button class="theme-toggle" id="themeToggle">🌓</button>
+
+    <div class="home-button">
+      <a href="index.html" class="btn btn-outline-primary">
+        <i class="fas fa-home"></i> O'rtaga qaytish
+      </a>
+    </div>
+
     <div class="container">
       <h1 class="mb-4">QR Code Scanner</h1>
 
       <!-- QR Code Scanner -->
       <div class="qr-box">
         <h3 class="mb-3">QR Kodni Skanerlash</h3>
-        <div>
-          <button id="startButton" class="btn btn-success">
-            Kamerani Yoqish
-          </button>
-          <button id="stopButton" class="btn btn-danger" style="display: none">
-            To'xtatish
-          </button>
-        </div>
+
         <div id="reader"></div>
         <div id="qr-result" style="display: none"></div>
       </div>
     </div>
 
-    <script src="assets/js/qr-code.js"></script>
+    <script src="./assets/packs/css/font.css"></script>
+    <script src="./assets/js/qr-code.js"></script>
   </body>
 </html>

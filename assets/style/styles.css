@@ -1,22 +1,46 @@
 /* Asosiy o'zgaruvchilar */
 :root {
-  --primary-color: #f8f9fa;
-  --secondary-color: #e9ecef;
-  --danger-color: #dc3545;
+  /* Light mode */
+  --primary-color-light: #ffffff;
+  --secondary-color-light: #f8f9fa;
+  --text-color-light: #2d3436;
+  --accent-color-light: #0984e3;
+  --border-color-light: #dfe6e9;
+
+  /* Dark mode */
+  --primary-color-dark: #2d3436;
+  --secondary-color-dark: #353b48;
+  --text-color-dark: #f5f6fa;
+  --accent-color-dark: #74b9ff;
+  --border-color-dark: #636e72;
+
+  /* Umumiy o'zgaruvchilar */
   --border-radius-lg: 30px;
   --border-radius-md: 15px;
   --transition-speed: 0.3s;
-  --shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  --shadow-light: 0 10px 20px rgba(0, 0, 0, 0.1);
+  --shadow-dark: 0 10px 20px rgba(0, 0, 0, 0.3);
 }
 
-/* Asosiy stillar */
+/* Dark mode & Light mode */
 body {
   background: linear-gradient(
     135deg,
-    var(--primary-color) 0%,
-    var(--secondary-color) 100%
+    var(--primary-color-light) 0%,
+    var(--secondary-color-light) 100%
   );
   min-height: 100vh;
+  color: var(--text-color-light);
+  transition: all var(--transition-speed) ease;
+}
+
+body.dark-mode {
+  background: linear-gradient(
+    135deg,
+    var(--primary-color-dark) 0%,
+    var(--secondary-color-dark) 100%
+  );
+  color: var(--text-color-dark);
 }
 
 /* Video elementlari uchun umumiy stillar */
@@ -25,11 +49,18 @@ body {
   height: 50vh;
   margin: 0 auto;
   border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-light);
+  transition: all var(--transition-speed) ease;
+}
+
+.dark-mode .video-container {
+  box-shadow: var(--shadow-dark);
 }
 
 #faceContainer {
   position: relative;
   overflow: hidden;
+  border-radius: var(--border-radius-lg);
 }
 
 #faceVideo,
@@ -39,10 +70,12 @@ body {
   object-fit: cover;
   border-radius: var(--border-radius-lg);
   transition: all var(--transition-speed) ease;
+  border: 3px solid var(--accent-color-light);
 }
 
-#faceVideo {
-  border: 3px solid var(--danger-color);
+.dark-mode #faceVideo,
+.dark-mode #video {
+  border-color: var(--accent-color-dark);
 }
 
 #faceCanvas {
@@ -60,21 +93,134 @@ body {
   border: none;
   transition: all var(--transition-speed) ease;
   cursor: pointer;
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  position: relative;
+}
+
+.dark-mode .auth-card {
+  background: rgba(45, 52, 54, 0.95);
+}
+
+.auth-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    45deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+}
+
+.auth-card:hover::before {
+  transform: translateX(100%);
 }
 
 .auth-card:hover {
-  transform: translateY(-5px);
-  box-shadow: var(--shadow);
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: var(--shadow-light);
+}
+
+.dark-mode .auth-card:hover {
+  box-shadow: var(--shadow-dark);
 }
 
 .auth-icon {
-  font-size: 3rem;
-  margin-bottom: 1rem;
+  font-size: 3.5rem;
+  margin-bottom: 1.5rem;
+  transition: transform var(--transition-speed) ease;
+}
+
+.auth-card:hover .auth-icon {
+  transform: scale(1.1);
+}
+
+/* Tugmalar */
+.btn {
+  padding: 12px 24px;
+  border-radius: var(--border-radius-md);
+  transition: all var(--transition-speed) ease;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-light);
+}
+
+.dark-mode .btn:hover {
+  box-shadow: var(--shadow-dark);
+}
+
+/* Tipografiya */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin-bottom: 1.5rem;
 }
 
 /* Responsive dizayn */
 @media (max-width: 768px) {
   .video-container {
     width: 90%;
+  }
+
+  .auth-card {
+    margin-bottom: 1.5rem;
+  }
+}
+
+/* Animatsiyalar */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.6s ease forwards;
+}
+
+/* Loading spinner */
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--border-color-light);
+  border-top: 4px solid var(--accent-color-light);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.dark-mode .spinner {
+  border-color: var(--border-color-dark);
+  border-top-color: var(--accent-color-dark);
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
   }
 }

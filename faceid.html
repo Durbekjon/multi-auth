@@ -1,17 +1,39 @@
 <!DOCTYPE html>
-<html>
+<html lang="uz">
   <head>
     <title>FaceID Authentication</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
+    <link href="./assets/packs/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="./assets/packs/css/font.css" rel="stylesheet" />
+    <script src="./assets/packs/js/face-api.js"></script>
     <style>
       body {
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        min-height: 100vh;
+        font-family: "Inter", sans-serif;
+      }
+
+      .theme-toggle {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 10px;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+        width: 50px;
+        height: 50px;
+      }
+
+      .theme-toggle:hover {
+        transform: scale(1.1);
+        background: rgba(0, 0, 0, 0.1);
+      }
+
+      .dark-mode .theme-toggle {
+        color: var(--text-color-dark);
       }
 
       #faceContainer {
@@ -20,16 +42,26 @@
         height: 50vh;
         margin: 0 auto;
         overflow: hidden;
-        border-radius: 30px;
+        border-radius: var(--border-radius-lg);
+        box-shadow: var(--shadow-light);
+        transition: all 0.3s ease;
+      }
+
+      .dark-mode #faceContainer {
+        box-shadow: var(--shadow-dark);
       }
 
       #faceVideo {
-        width: 70%;
-        height: 50vh;
-        border: 3px solid #dc3545;
-        border-radius: 30px;
+        width: 100%;
+        height: 100%;
+        border: 3px solid var(--accent-color-light);
+        border-radius: var(--border-radius-lg);
         object-fit: cover;
         transition: all 0.3s ease;
+      }
+
+      .dark-mode #faceVideo {
+        border-color: var(--accent-color-dark);
       }
 
       #faceCanvas {
@@ -38,7 +70,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        border-radius: 30px;
+        border-radius: var(--border-radius-lg);
         pointer-events: none;
       }
 
@@ -46,58 +78,176 @@
         background: rgba(255, 255, 255, 0.95);
         border: none;
         transition: all 0.3s ease;
+        border-radius: var(--border-radius-lg);
+        overflow: hidden;
+        position: relative;
       }
 
-      .auth-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      .dark-mode {
+        background: rgba(45, 52, 54, 0.95);
+      }
+
+      .auth-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          45deg,
+          transparent,
+          rgba(255, 255, 255, 0.1),
+          transparent
+        );
+        transform: translateX(-100%);
+        transition: transform 0.6s ease;
+      }
+
+      .auth-card:hover::before {
+        transform: translateX(100%);
+      }
+
+      .btn-group {
+        gap: 10px;
+      }
+
+      .btn {
+        padding: 12px 24px;
+        border-radius: var(--border-radius-md);
+        transition: all 0.3s ease;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-light);
+      }
+
+      .dark-mode .btn:hover {
+        box-shadow: var(--shadow-dark);
+      }
+
+      .btn:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      #faceResult {
+        margin-top: 1.5rem;
+        border-radius: var(--border-radius-md);
+        padding: 1rem;
+        transition: all 0.3s ease;
+      }
+
+      .alert-success {
+        background: rgba(40, 167, 69, 0.1);
+        border: 1px solid rgba(40, 167, 69, 0.2);
+        color: #28a745;
+      }
+
+      .alert-danger {
+        background: rgba(220, 53, 69, 0.1);
+        border: 1px solid rgba(220, 53, 69, 0.2);
+        color: #dc3545;
+      }
+
+      .dark-mode .alert-success {
+        background: rgba(40, 167, 69, 0.2);
+        border-color: rgba(40, 167, 69, 0.3);
+      }
+
+      .dark-mode .alert-danger {
+        background: rgba(220, 53, 69, 0.2);
+        border-color: rgba(220, 53, 69, 0.3);
+      }
+
+      h1 {
+        font-size: 2.5rem;
+        margin-bottom: 3rem;
+        background: linear-gradient(45deg, var(--accent-color-light), #00b894);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .dark-mode h1 {
+        background: linear-gradient(45deg, var(--accent-color-dark), #00b894);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
       }
 
       @media (max-width: 768px) {
         #faceContainer {
           width: 90%;
         }
+
+        .btn-group {
+          flex-direction: column;
+        }
+
+        .btn {
+          width: 100%;
+          margin-bottom: 10px;
+        }
+      }
+
+      .home-button {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 1000;
+      }
+      .home-button .btn {
+        padding: 8px 16px;
+        border-radius: 20px;
+        transition: all 0.3s ease;
+        background: rgba(255, 255, 255, 0.9);
+      }
+      .dark-mode .home-button .btn {
+        background: rgba(45, 52, 54, 0.9);
+        color: #ffffff;
+      }
+      .home-button .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-light);
+      }
+      .dark-mode .home-button .btn:hover {
+        box-shadow: var(--shadow-dark);
       }
     </style>
   </head>
   <body class="py-5">
+    <button class="theme-toggle" id="themeToggle">🌓</button>
+
+    <div class="home-button">
+      <a href="index.html" class="btn btn-outline-primary">
+        <i class="fas fa-home"></i> O'rtaga qaytish
+      </a>
+    </div>
+
     <div class="container">
-      <h1 class="text-center mb-5 fw-bold text-primary">
-        FaceID Authentication
-      </h1>
+      <h1 class="text-center mb-5 fw-bold fade-in">FaceID Authentication</h1>
 
       <div class="row justify-content-center">
         <div class="col-lg-8">
-          <div class="card auth-card shadow-lg">
+          <div class="card auth-card shadow-lg fade-in">
             <div class="card-body p-4">
-              <div id="faceContainer" class="mb-4 shadow">
+              <div id="faceContainer" class="mb-4">
                 <video id="faceVideo" autoplay muted playsinline></video>
                 <canvas id="faceCanvas"></canvas>
               </div>
               <div class="text-center">
                 <div class="btn-group mb-3">
-                  <button
-                    id="startCameraButton"
-                    class="btn btn-info btn-lg px-4"
-                  >
-                    Kamerani Yoqish
-                  </button>
-                  <button
-                    id="registerButton"
-                    class="btn btn-success btn-lg px-4"
-                    disabled
-                  >
-                    Register Face
-                  </button>
-                  <button
-                    id="faceIdButton"
-                    class="btn btn-primary btn-lg px-4"
-                    disabled
-                  >
-                    Authenticate Face
+                  <button id="refreshButton" class="btn btn-primary d-none">
+                    <i class="bi bi-arrow-clockwise"></i> Qayta tekshirish
                   </button>
                 </div>
-                <div id="faceResult" class="alert d-none" role="alert"></div>
+                <div id="faceResult" class="alert" role="alert"></div>
               </div>
             </div>
           </div>
@@ -105,14 +255,36 @@
       </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="./assets/packs/js/bootstrap.bundle.min.js"></script>
     <script>
+      // Dark mode toggle
+      const themeToggle = document.getElementById("themeToggle");
+      const body = document.body;
+
+      // Check for saved theme preference
+      const savedTheme = localStorage.getItem("theme");
+      if (savedTheme === "dark") {
+        body.classList.add("dark-mode");
+        themeToggle.textContent = "🌙";
+      }
+
+      themeToggle.addEventListener("click", () => {
+        body.classList.toggle("dark-mode");
+        if (body.classList.contains("dark-mode")) {
+          themeToggle.textContent = "🌙";
+          localStorage.setItem("theme", "dark");
+        } else {
+          themeToggle.textContent = "🌓";
+          localStorage.setItem("theme", "light");
+        }
+      });
+
       // IndexDB setup
       let db;
       const DB_NAME = "FaceAuthDB";
-      const STORE_NAME = "faceDescriptors";
+      const STORE_NAME = "workers";
 
-      const request = indexedDB.open(DB_NAME, 1);
+      const request = indexedDB.open(DB_NAME, 2);
 
       request.onerror = (event) => {
         console.error("Database error:", event.target.error);
@@ -121,7 +293,10 @@
       request.onupgradeneeded = (event) => {
         db = event.target.result;
         if (!db.objectStoreNames.contains(STORE_NAME)) {
-          db.createObjectStore(STORE_NAME, { keyPath: "id" });
+          db.createObjectStore(STORE_NAME, {
+            keyPath: "id",
+            autoIncrement: true,
+          });
         }
       };
 
@@ -131,9 +306,7 @@
       };
 
       // Variable declarations
-      const faceIdButton = document.getElementById("faceIdButton");
-      const registerButton = document.getElementById("registerButton");
-      const startCameraButton = document.getElementById("startCameraButton");
+      const refreshButton = document.getElementById("refreshButton");
       const faceResult = document.getElementById("faceResult");
       const faceVideo = document.getElementById("faceVideo");
       const faceCanvas = document.getElementById("faceCanvas");
@@ -141,6 +314,85 @@
       let modelsLoaded = false;
       let videoReady = false;
       let cameraStarted = false;
+      let isAuthenticating = false;
+      let faceDetectionInterval;
+      let currentStream = null;
+      let hasCameraPermission = false;
+
+      // Kamera ruxsatini olish
+      async function requestCameraPermission() {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+              width: { ideal: 640 },
+              height: { ideal: 480 },
+              facingMode: "user",
+            },
+          });
+          currentStream = stream;
+          hasCameraPermission = true;
+          return stream;
+        } catch (err) {
+          console.error("Kamera ruxsati berilmadi:", err);
+          hasCameraPermission = false;
+          throw err;
+        }
+      }
+
+      // Kamera oqimini qayta ishga tushirish
+      async function restartCamera() {
+        if (!hasCameraPermission) {
+          try {
+            await requestCameraPermission();
+          } catch (err) {
+            updateResultMessage(
+              faceResult,
+              "Kamera ruxsati berilmadi. Iltimos, kamera ruxsatini bering.",
+              false
+            );
+            return;
+          }
+        }
+
+        if (currentStream) {
+          currentStream.getTracks().forEach((track) => track.stop());
+        }
+
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+              width: { ideal: 640 },
+              height: { ideal: 480 },
+              facingMode: "user",
+            },
+          });
+          currentStream = stream;
+          faceVideo.srcObject = stream;
+
+          await waitForVideo();
+          videoReady = true;
+          cameraStarted = true;
+
+          faceCanvas.width = faceVideo.videoWidth;
+          faceCanvas.height = faceVideo.videoHeight;
+
+          updateResultMessage(
+            faceResult,
+            "Kamera muvaffaqiyatli yoqildi. Yuzni aniqlash kutilmoqda...",
+            true
+          );
+
+          faceDetectionInterval = setInterval(checkFacePresence, 1000);
+        } catch (err) {
+          console.error("Kamerani ishga tushirishda xatolik:", err);
+          updateResultMessage(
+            faceResult,
+            "Kamerani ishga tushirishda xatolik. Qayta urinilmoqda...",
+            false
+          );
+          refreshButton.classList.remove("d-none");
+        }
+      }
 
       // Load face-api.js models
       async function loadModels() {
@@ -160,12 +412,8 @@
             ),
           ]);
           modelsLoaded = true;
-          startCameraButton.disabled = false;
-          updateResultMessage(
-            faceResult,
-            "Modellar yuklandi. Kamerani yoqish tugmasini bosing",
-            true
-          );
+          updateResultMessage(faceResult, "Modellar yuklanmoqda...", true);
+          await restartCamera();
         } catch (error) {
           console.error("Model yuklashda xatolik:", error);
           setTimeout(loadModels, 2000);
@@ -176,8 +424,6 @@
       document.addEventListener("DOMContentLoaded", () => {
         loadModels();
       });
-
-      let faceDetectionInterval;
 
       async function waitForVideo() {
         return new Promise((resolve) => {
@@ -191,174 +437,36 @@
         });
       }
 
-      // Add event listener for start camera button
-      startCameraButton.addEventListener("click", async () => {
-        if (!cameraStarted) {
-          startCameraButton.textContent = "Kamera yuklanmoqda...";
-          startCameraButton.disabled = true;
-          await startFaceDetection();
-        }
-      });
-
-      async function startFaceDetection() {
-        if (!modelsLoaded) {
-          console.log("Modellar yuklanmagan, qayta urinilmoqda...");
-          setTimeout(startFaceDetection, 1000);
-          return;
-        }
-
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({
-            video: {
-              width: { ideal: 640 },
-              height: { ideal: 480 },
-              facingMode: "user",
-            },
-          });
-          faceVideo.srcObject = stream;
-
-          await waitForVideo();
-          videoReady = true;
-          cameraStarted = true;
-
-          faceCanvas.width = faceVideo.videoWidth;
-          faceCanvas.height = faceVideo.videoHeight;
-
-          // Enable buttons after camera is ready
-          registerButton.disabled = false;
-          faceIdButton.disabled = false;
-          startCameraButton.textContent = "Kamera Yoqildi";
-          updateResultMessage(
-            faceResult,
-            "Kamera muvaffaqiyatli yoqildi. Endi yuzni ro'yxatdan o'tkazish yoki autentifikatsiya qilish mumkin",
-            true
-          );
-
-          faceDetectionInterval = setInterval(checkFacePresence, 1000);
-        } catch (err) {
-          console.error("Kamerani ishga tushirishda xatolik:", err);
-          updateResultMessage(
-            faceResult,
-            "Kamerani ishga tushirishda xatolik. Qayta urinilmoqda...",
-            false
-          );
-          startCameraButton.disabled = false;
-          startCameraButton.textContent = "Kamerani Yoqish";
-          setTimeout(startFaceDetection, 2000);
-        }
-      }
-
       async function checkFacePresence() {
+        if (isAuthenticating) return;
+
         const detection = await faceapi
           .detectSingleFace(faceVideo, new faceapi.TinyFaceDetectorOptions())
           .withFaceLandmarks();
 
         if (detection) {
-          faceVideo.style.borderColor = "#198754"; // Bootstrap success color
+          faceVideo.style.borderColor = "#198754";
+          clearInterval(faceDetectionInterval);
+          isAuthenticating = true;
+          await startFaceAuthentication();
         } else {
-          faceVideo.style.borderColor = "#dc3545"; // Bootstrap danger color
+          faceVideo.style.borderColor = "#dc3545";
         }
       }
 
-      let isAuthenticating = false;
-
-      // Add event listener for authentication button
-      faceIdButton.addEventListener("click", async () => {
-        if (!isAuthenticating) {
-          isAuthenticating = true;
-          faceIdButton.textContent = "Tekshirilmoqda...";
-          await startFaceAuthentication();
-        }
+      // Refresh button event listener
+      refreshButton.addEventListener("click", async (e) => {
+        e.preventDefault();
+        refreshButton.classList.add("d-none");
+        isAuthenticating = false;
+        faceResult.classList.add("d-none");
+        await restartCamera();
       });
 
-      // Face registration functionality
-      registerButton.addEventListener("click", async () => {
-        if (!videoReady) {
-          updateResultMessage(
-            faceResult,
-            "Video tayyor emas. Iltimos, kamera ishga tushishini kuting",
-            false
-          );
-          return;
-        }
-
-        try {
-          const displaySize = {
-            width: faceVideo.videoWidth,
-            height: faceVideo.videoHeight,
-          };
-
-          faceCanvas.width = displaySize.width;
-          faceCanvas.height = displaySize.height;
-
-          const detection = await faceapi
-            .detectSingleFace(faceVideo)
-            .withFaceLandmarks()
-            .withFaceDescriptor();
-
-          if (detection) {
-            const descriptor = Array.from(detection.descriptor);
-
-            // Draw detections and landmarks
-            const detections = await faceapi
-              .detectAllFaces(faceVideo)
-              .withFaceLandmarks();
-
-            const resizedDetections = faceapi.resizeResults(
-              detections,
-              displaySize
-            );
-            const ctx = faceCanvas.getContext("2d");
-            ctx.clearRect(0, 0, faceCanvas.width, faceCanvas.height);
-
-            faceapi.draw.drawDetections(faceCanvas, resizedDetections);
-            faceapi.draw.drawFaceLandmarks(faceCanvas, resizedDetections);
-
-            const transaction = db.transaction([STORE_NAME], "readwrite");
-            const store = transaction.objectStore(STORE_NAME);
-
-            const faceData = {
-              id: Date.now(),
-              descriptor: descriptor,
-              timestamp: new Date().toISOString(),
-            };
-
-            const addRequest = store.add(faceData);
-
-            addRequest.onsuccess = () => {
-              updateResultMessage(
-                faceResult,
-                "Yuz muvaffaqiyatli ro'yxatdan o'tkazildi!",
-                true
-              );
-              faceVideo.style.borderColor = "#198754";
-              console.log("Stored face data:", faceData);
-            };
-
-            addRequest.onerror = () => {
-              updateResultMessage(
-                faceResult,
-                "Ro'yxatdan o'tkazishda xatolik yuz berdi",
-                false
-              );
-              faceVideo.style.borderColor = "#dc3545";
-            };
-          } else {
-            updateResultMessage(
-              faceResult,
-              "Yuz aniqlanmadi. Iltimos, qayta urinib ko'ring.",
-              false
-            );
-            faceVideo.style.borderColor = "#dc3545";
-          }
-        } catch (error) {
-          console.error("Registration error:", error);
-          updateResultMessage(
-            faceResult,
-            "Ro'yxatdan o'tkazishda xatolik yuz berdi. Iltimos, qayta urinib ko'ring.",
-            false
-          );
-          faceVideo.style.borderColor = "#dc3545";
+      // Sahifa yopilganda kamerani to'xtatish
+      window.addEventListener("beforeunload", () => {
+        if (currentStream) {
+          currentStream.getTracks().forEach((track) => track.stop());
         }
       });
 
@@ -415,40 +523,39 @@
             const request = store.getAll();
 
             request.onsuccess = () => {
-              const storedFaces = request.result;
+              const workers = request.result;
               let isMatch = false;
-              let bestMatch = { distance: 1.0 };
+              let bestMatch = { distance: 1.0, worker: null };
 
-              console.log("Stored faces count:", storedFaces.length);
-
-              if (storedFaces.length === 0) {
+              if (workers.length === 0) {
                 updateResultMessage(
                   faceResult,
-                  "Hech qanday yuz topilmadi. Iltimos, avval ro'yxatdan o'ting.",
+                  "Hech qanday ishchi topilmadi. Iltimos, avval ro'yxatdan o'ting.",
                   false
                 );
                 faceVideo.style.borderColor = "#dc3545";
+                refreshButton.classList.remove("d-none");
                 return;
               }
 
-              for (const face of storedFaces) {
-                const distance = faceapi.euclideanDistance(
-                  currentDescriptor,
-                  new Float32Array(face.descriptor)
-                );
+              for (const worker of workers) {
+                if (worker.faceDescriptor) {
+                  const distance = faceapi.euclideanDistance(
+                    currentDescriptor,
+                    new Float32Array(worker.faceDescriptor)
+                  );
 
-                console.log("Face match distance:", distance);
+                  if (distance < bestMatch.distance) {
+                    bestMatch = {
+                      distance: distance,
+                      worker: worker,
+                    };
+                  }
 
-                if (distance < bestMatch.distance) {
-                  bestMatch = {
-                    distance: distance,
-                    timestamp: face.timestamp,
-                  };
-                }
-
-                if (distance < 0.4) {
-                  isMatch = true;
-                  break;
+                  if (distance < 0.4) {
+                    isMatch = true;
+                    break;
+                  }
                 }
               }
 
@@ -457,15 +564,18 @@
               );
 
               if (isMatch && matchPercentage > 60) {
-                const matchTime = new Date(
-                  bestMatch.timestamp
-                ).toLocaleString();
+                const worker = bestMatch.worker;
                 updateResultMessage(
                   faceResult,
-                  `Yuz tasdiqlandi! Xush kelibsiz! (Ro'yxatdan o'tgan vaqt: ${matchTime}, Moslik: ${matchPercentage}%)`,
+                  `Yuz tasdiqlandi! Xush kelibsiz, ${worker.name}! (Lavozim: ${worker.position}, Harbiy unvon: ${worker.militaryRank}, QK turi: ${worker.qkType}, Moslik: ${matchPercentage}%)`,
                   true
                 );
                 faceVideo.style.borderColor = "#198754";
+                const audio = new Audio("./assets/audios/welcome.mp3");
+                audio.addEventListener("error", (e) => {
+                  console.error("Audio xatolik:", e.target.error);
+                });
+                audio.play();
               } else {
                 updateResultMessage(
                   faceResult,
@@ -474,6 +584,7 @@
                 );
                 faceVideo.style.borderColor = "#dc3545";
               }
+              refreshButton.classList.remove("d-none");
             };
 
             request.onerror = () => {
@@ -484,6 +595,7 @@
                 false
               );
               faceVideo.style.borderColor = "#dc3545";
+              refreshButton.classList.remove("d-none");
             };
           } else {
             updateResultMessage(
@@ -492,6 +604,7 @@
               false
             );
             faceVideo.style.borderColor = "#dc3545";
+            refreshButton.classList.remove("d-none");
           }
         } catch (error) {
           console.error("Authentication error:", error);
@@ -501,9 +614,7 @@
             false
           );
           faceVideo.style.borderColor = "#dc3545";
-        } finally {
-          isAuthenticating = false;
-          faceIdButton.textContent = "Authenticate Face";
+          refreshButton.classList.remove("d-none");
         }
       }
 
