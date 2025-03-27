@@ -224,3 +224,85 @@ h6 {
     transform: rotate(360deg);
   }
 }
+body {
+  font-family: "Inter", sans-serif;
+}
+
+.theme-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  width: 50px;
+  height: 50px;
+}
+
+.theme-toggle:hover {
+  transform: scale(1.1);
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.dark-mode .theme-toggle {
+  color: var(--text-color-dark);
+}
+
+.auth-card {
+  height: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 2rem;
+}
+
+.auth-icon {
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(45deg, var(--accent-color-light), #00b894);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.dark-mode .auth-icon {
+  background: linear-gradient(45deg, var(--accent-color-dark), #00b894);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.card-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.card-text {
+  font-size: 1rem;
+  opacity: 0.8;
+}
+
+.container {
+  max-width: 1200px;
+  padding: 2rem;
+}
+
+h1 {
+  font-size: 2.5rem;
+  margin-bottom: 3rem;
+  background: linear-gradient(45deg, var(--accent-color-light), #00b894);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.dark-mode h1 {
+  background: linear-gradient(45deg, var(--accent-color-dark), #00b894);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
