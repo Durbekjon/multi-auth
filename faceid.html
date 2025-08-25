@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="uz">
+  <head>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="apple-mobile-web-app-title" content="Authentication App" />
+    <title>FaceID Authentication</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="manifest" href="manifest.json" />
+    <link href="assets/packs/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="assets/packs/css/font.css" rel="stylesheet" />
+    <link href="assets/packs/css/bootstrap-icons.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="assets/style/styles.css" />
+    <script src="assets/packs/js/face-api.js"></script>
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("/sw.js")
+            .then((registration) => {
+              console.log("ServiceWorker registration successful");
+            })
+            .catch((err) => {
+              console.log("ServiceWorker registration failed: ", err);
+            });
+        });
+      }
+    </script>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="index.html">
+          <i class="bi bi-people"></i> Xodimlar Boshqaruvi
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a class="nav-link" href="index.html">Bosh sahifa</a></li>
+            <li class="nav-item"><a class="nav-link active" href="faceid.html">FaceID</a></li>
+            <li class="nav-item"><a class="nav-link" href="qrcode.html">QR Kod</a></li>
+            <li class="nav-item"><a class="nav-link" href="workers.html">Xodimlar</a></li>
+            <li class="nav-item"><a class="nav-link" href="documentation.html">Qo'llanma</a></li>
+            <li class="nav-item"><a class="nav-link" href="settings.html">Sozlamalar</a></li>
+          </ul>
+          <button class="btn btn-outline-light ms-3" id="themeToggle">🌓</button>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container py-4">
+      <div class="home-button">
+        <a href="index.html" class="btn btn-outline-primary">
+          <i class="fas fa-home"></i> O'rtaga qaytish
+        </a>
+      </div>
+
+      <div class="container card border-0">
+        <h1 class="text-center mb-5 fw-bold fade-in">FaceID Authentication</h1>
+
+        <div class="row justify-content-center">
+          <div class="col-lg-8">
+            <div class="card auth-card shadow-lg fade-in">
+              <div class="card-body p-4">
+                <div id="faceContainer" style="display: block" class="mb-4">
+                  <video id="faceVideo" autoplay muted playsinline></video>
+                  <canvas id="faceCanvas"></canvas>
+                </div>
+                <div id="workerCardContainer" class="col" style="display: none"></div>
+                <div class="text-center">
+                  <div class="btn-group mb-3">
+                    <button id="refreshButton" class="btn btn-primary d-none">
+                      <i class="bi bi-arrow-clockwise"></i> Qayta tekshirish
+                    </button>
+                  </div>
+                  <div id="faceResult" class="alert" role="alert"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer mt-5 py-3 bg-light">
+      <div class="container text-center">
+        <span class="text-muted">&copy; 2025 Xodimlar Boshqaruvi Tizimi. Barcha huquqlar himoyalangan.</span>
+      </div>
+    </footer>
+
+    <script src="assets/packs/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/faceid.js"></script>
+  </body>
+</html>

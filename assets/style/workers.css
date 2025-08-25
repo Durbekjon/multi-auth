@@ -1,0 +1,329 @@
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+.theme-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  width: 50px;
+  height: 50px;
+}
+
+.theme-toggle:hover {
+  transform: scale(1.1);
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.dark-mode .theme-toggle {
+  color: var(--text-color-dark);
+}
+
+.worker-card {
+  background: rgba(255, 255, 255, 0.95);
+  border: none;
+  transition: all 0.3s ease;
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.dark-mode .worker-card {
+  background: rgba(45, 52, 54, 0.95);
+  color: white;
+}
+
+.worker-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    45deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+}
+
+.worker-card:hover::before {
+  transform: translateX(100%);
+}
+
+.worker-image {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin-bottom: 1rem;
+  border: 3px solid var(--accent-color-light);
+  transition: all 0.3s ease;
+}
+
+.dark-mode .worker-image {
+  border-color: var(--accent-color-dark);
+}
+
+.worker-info {
+  margin-bottom: 0.5rem;
+}
+
+.worker-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.action-btn {
+  padding: 0.5rem;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.1);
+  color: #333;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dark-mode .action-btn {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.action-btn:hover {
+  transform: translateY(-2px);
+  background: var(--accent-color-light);
+  color: white;
+}
+
+.dark-mode .action-btn:hover {
+  background: var(--accent-color-dark);
+}
+
+h1 {
+  font-size: 2.5rem;
+  margin-bottom: 3rem;
+  background: linear-gradient(45deg, var(--accent-color-light), #00b894);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.dark-mode h1 {
+  background: linear-gradient(45deg, var(--accent-color-dark), #00b894);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@media (max-width: 768px) {
+  .worker-card {
+    margin-bottom: 1rem;
+  }
+
+  .worker-image {
+    width: 100px;
+    height: 100px;
+  }
+
+  .action-btn {
+    width: 35px;
+    height: 35px;
+  }
+}
+
+.search-box {
+  position: relative;
+  margin-bottom: 2rem;
+}
+
+.search-input {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  border: none;
+  border-radius: 2rem;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.dark-mode .search-input {
+  background: rgba(45, 52, 54, 0.95);
+  color: white;
+}
+
+.search-input:focus {
+  outline: none;
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+.search-icon {
+  position: absolute;
+  right: 1.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #666;
+}
+
+.dark-mode .search-icon {
+  color: #fff;
+}
+
+.badge {
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.badge-military {
+  background: rgba(0, 123, 255, 0.1);
+  color: #007bff;
+}
+
+.dark-mode .badge-military {
+  background: rgba(0, 123, 255, 0.2);
+}
+
+.badge-position {
+  background: rgba(40, 167, 69, 0.1);
+  color: #28a745;
+}
+
+.dark-mode .badge-position {
+  background: rgba(40, 167, 69, 0.2);
+}
+
+.badge-qk {
+  background: rgba(255, 193, 7, 0.1);
+  color: #ffc107;
+}
+
+.dark-mode .badge-qk {
+  background: rgba(255, 193, 7, 0.2);
+}
+
+.qk-logo {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  margin: 0 auto;
+}
+
+.btn-group .btn {
+  margin-right: 5px;
+}
+
+.btn-group .btn:last-child {
+  margin-right: 0;
+}
+
+.btn-group .btn i {
+  margin-right: 5px;
+}
+
+@media (max-width: 768px) {
+  .qk-logo {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* Pagination styles */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+.pagination-btn {
+  padding: 0.5rem 1rem;
+  margin: 0 0.25rem;
+  border: none;
+  border-radius: 0.5rem;
+  background: rgba(0, 0, 0, 0.1);
+  color: #333;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.dark-mode .pagination-btn {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: var(--accent-color-light);
+  color: white;
+  transform: translateY(-2px);
+}
+
+.dark-mode .pagination-btn:hover:not(:disabled) {
+  background: var(--accent-color-dark);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-info {
+  margin: 0 1rem;
+  color: #666;
+}
+
+.dark-mode .pagination-info {
+  color: #fff;
+}
+
+/* Loading indicator */
+.loading-spinner {
+  display: none;
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+.loading-spinner.active {
+  display: block;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.home-button {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+}

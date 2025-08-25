@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="uz">
+  <head>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="apple-mobile-web-app-title" content="Authentication App" />
+    <title>Ishchilar</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="manifest" href="manifest.json" />
+    <link href="assets/packs/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="assets/packs/css/font.css" rel="stylesheet" />
+    <link href="assets/packs/css/bootstrap-icons.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="assets/style/styles.css" />
+    <script src="assets/packs/js/face-api.js"></script>
+    <script src="assets/packs/js/qrcode.min.js"></script>
+    <script src="assets/packs/js/qrcode1-4-4.min.js"></script>
+
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("/sw.js")
+            .then((registration) => {
+              console.log("ServiceWorker registration successful");
+            })
+            .catch((err) => {
+              console.log("ServiceWorker registration failed: ", err);
+            });
+        });
+      }
+    </script>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="index.html">
+          <i class="bi bi-people"></i> Xodimlar Boshqaruvi
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a class="nav-link" href="index.html">Bosh sahifa</a></li>
+            <li class="nav-item"><a class="nav-link" href="faceid.html">FaceID</a></li>
+            <li class="nav-item"><a class="nav-link" href="qrcode.html">QR Kod</a></li>
+            <li class="nav-item"><a class="nav-link active" href="workers.html">Xodimlar</a></li>
+            <li class="nav-item"><a class="nav-link" href="documentation.html">Qo'llanma</a></li>
+            <li class="nav-item"><a class="nav-link" href="settings.html">Sozlamalar</a></li>
+          </ul>
+          <button class="btn btn-outline-light ms-3" id="themeToggle">🌓</button>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container py-4">
+      <div class="home-button">
+        <a href="index.html" class="btn btn-outline-primary">
+          <i class="bi bi-house-door"></i> O'rtaga qaytish
+        </a>
+      </div>
+
+      <div class="container">
+        <h1 class="text-center mb-5 fw-bold fade-in">Ishchilar</h1>
+
+        <div class="row justify-content-center mb-4">
+          <div class="col-lg-6">
+            <div class="loading-spinner" id="loadingSpinner"></div>
+            <div class="search-box">
+              <input type="text" class="search-input" placeholder="Qidirish..." id="searchInput" />
+              <i class="bi bi-search search-icon"></i>
+            </div>
+          </div>
+          <div class="col-lg-2 text-end">
+            <button class="btn btn-primary" onclick="showAddWorkerModal()">
+              <i class="bi bi-plus-lg"></i> Yangi ishchi
+            </button>
+          </div>
+        </div>
+
+        <div class="row" id="workersContainer">
+          <div class="col-12">
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Rasm</th>
+                    <th>F.I.O</th>
+                    <th>Lavozim</th>
+                    <th>Harbiy unvon</th>
+                    <th>QK turi</th>
+                    <th>Amallar</th>
+                  </tr>
+                </thead>
+                <tbody id="workersTableBody">
+                  <!-- Worker rows will be dynamically added here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="pagination-container" id="paginationContainer">
+          <button class="pagination-btn" id="prevBtn" disabled>
+            <i class="bi bi-chevron-left"></i> Oldingi
+          </button>
+          <span class="pagination-info" id="paginationInfo"></span>
+          <button class="pagination-btn" id="nextBtn">
+            Keyingi <i class="bi bi-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Add Worker Modal -->
+      <div class="modal fade" id="addWorkerModal" tabindex="-1" aria-labelledby="addWorkerModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="addWorkerModalLabel">Yangi ishchi qo'shish</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form id="addWorkerForm">
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="workerName" class="form-label">F.I.O</label>
+                    <input type="text" class="form-control" id="workerName" required />
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="workerPosition" class="form-label">Lavozim</label>
+                    <input type="text" class="form-control" id="workerPosition" required />
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="workerMilitaryRank" class="form-label">Harbiy unvon</label>
+                    <input type="text" class="form-control" id="workerMilitaryRank" required />
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="workerQKType" class="form-label">QK turi</label>
+                    <select class="form-select" id="workerQKType" required>
+                      <option value="mudofaa">Mudofaa vazirligi</option>
+                      <option value="fvv">Favqulodda vaziyatlar vazirligi</option>
+                      <option value="dxx">Davlat xavfsizlik xizmati</option>
+                      <option value="dxx-chegara">Davlat xavfsizlik xizmati chegara qo'shinlari</option>
+                      <option value="ichki">Ichki ishlar vazirligi</option>
+                      <option value="gvardiya">Milliy gvardiya</option>
+                      <option value="bojxona">Maxsus operatsiya kuchlari qo'mondonligi</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label for="workerImage" class="form-label">Rasm</label>
+                  <input type="file" class="form-control" id="workerImage" accept="image/*" required />
+                  <div id="imagePreview" class="mt-2 text-center"></div>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bekor qilish</button>
+              <button type="button" class="btn btn-primary" onclick="saveNewWorker()">Saqlash</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer mt-5 py-3 bg-light">
+      <div class="container text-center">
+        <span class="text-muted">&copy; 2025 Xodimlar Boshqaruvi Tizimi. Barcha huquqlar himoyalangan.</span>
+      </div>
+    </footer>
+
+    <script src="assets/packs/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/workers.js"></script>
+  </body>
+</html>

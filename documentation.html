@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="uz">
+  <head>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="apple-mobile-web-app-title" content="Authentication App" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Documentation - Xodimlar Boshqaruvi Tizimi</title>
+    <link rel="manifest" href="manifest.json" />
+    <link href="assets/packs/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="assets/packs/css/font.css" rel="stylesheet" />
+    <link href="assets/packs/css/bootstrap-icons.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="assets/style/styles.css" />
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("/sw.js")
+            .then((registration) => {
+              console.log("ServiceWorker registration successful");
+            })
+            .catch((err) => {
+              console.log("ServiceWorker registration failed: ", err);
+            });
+        });
+      }
+    </script>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="index.html">
+          <i class="bi bi-people"></i> Xodimlar Boshqaruvi
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a class="nav-link" href="index.html">Bosh sahifa</a></li>
+            <li class="nav-item"><a class="nav-link" href="faceid.html">FaceID</a></li>
+            <li class="nav-item"><a class="nav-link" href="qrcode.html">QR Kod</a></li>
+            <li class="nav-item"><a class="nav-link" href="workers.html">Xodimlar</a></li>
+            <li class="nav-item"><a class="nav-link active" href="documentation.html">Qo'llanma</a></li>
+            <li class="nav-item"><a class="nav-link" href="settings.html">Sozlamalar</a></li>
+          </ul>
+          <button class="btn btn-outline-light ms-3" id="themeToggle">🌓</button>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container py-4">
+      <div class="row">
+        <div class="col-lg-3">
+          <div class="sticky-top">
+            <div class="list-group">
+              <a href="#intro" class="list-group-item list-group-item-action active">
+                <i class="bi bi-info-circle"></i> Kiritish
+              </a>
+              <a href="#faceid" class="list-group-item list-group-item-action">
+                <i class="bi bi-camera"></i> FaceID Tizimi
+              </a>
+              <a href="#qr" class="list-group-item list-group-item-action">
+                <i class="bi bi-qr-code"></i> QR Kod Tizimi
+              </a>
+              <a href="#workers" class="list-group-item list-group-item-action">
+                <i class="bi bi-people"></i> Xodimlar Boshqaruvi
+              </a>
+              <a href="#settings" class="list-group-item list-group-item-action">
+                <i class="bi bi-gear"></i> Sozlamalar
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-9">
+          <section id="intro">
+            <h1 class="mb-4">Xodimlar Boshqaruvi Tizimi</h1>
+            <p class="lead">
+              Bu tizim xodimlarni boshqarish va ko'rib chiqish uchun mo'ljallangan. Tizim quyidagi asosiy funksionallikka ega:
+            </p>
+            <ul class="features-list">
+              <li>
+                <i class="bi bi-check-circle"></i> FaceID orqali xodimlarni tasdiqlash
+              </li>
+              <li>
+                <i class="bi bi-check-circle"></i> QR kod yordamida xodimlarni tasdiqlash
+              </li>
+              <li>
+                <i class="bi bi-check-circle"></i> Xodimlar ro'yxatini ko'rish va boshqaru
+              </li>
+              <li>
+                <i class="bi bi-check-circle"></i> Xodimlar haqidagi ma'lumotlarni ko'rish
+              </li>
+            </ul>
+          </section>
+
+          <section id="faceid" class="mt-5">
+            <h2><i class="bi bi-camera"></i> FaceID Tizimi</h2>
+            <p>
+              FaceID tizimi xodimlarni yuz tasviri orqali tasdiqlaydi. Tizim quyidagi qadamlarni bajaradi:
+            </p>
+            <ol class="steps">
+              <li>
+                <i class="bi bi-1-circle"></i> Kamera yoqiladi va xodimning yuzi aniqlanadi
+              </li>
+              <li>
+                <i class="bi bi-2-circle"></i> Yuz tasviri bazadagi ma'lumotlar bilan solishtiriladi
+              </li>
+              <li>
+                <i class="bi bi-3-circle"></i> Agar xodim topilsa, uning ma'lumotlari ko'rsatiladi
+              </li>
+            </ol>
+            <div class="alert alert-info">
+              <i class="bi bi-info-circle"></i>
+              <strong>Ma'lumot:</strong> Tasdiqlash natijasi qo'shimcha ovozli xabar bilan ko'rsatiladi
+            </div>
+          </section>
+
+          <section id="qr" class="mt-5">
+            <h2><i class="bi bi-qr-code"></i> QR Kod Tizimi</h2>
+            <p>
+              QR kod tizimi xodimlarni QR kod yordamida tasdiqlaydi. Tizim quyidagi qadamlarni bajaradi:
+            </p>
+            <ol class="steps">
+              <li>
+                <i class="bi bi-1-circle"></i> Kamera yoqiladi va QR kod aniqlanadi
+              </li>
+              <li>
+                <i class="bi bi-2-circle"></i> QR kod bazadagi ma'lumotlar bilan solishtiriladi
+              </li>
+              <li>
+                <i class="bi bi-3-circle"></i> Agar xodim topilsa, uning ma'lumotlari ko'rsatiladi
+              </li>
+            </ol>
+            <div class="alert alert-warning">
+              <i class="bi bi-exclamation-triangle"></i>
+              <strong>Eslatma:</strong> QR kod yuzaga to'g'ri qarab bo'lishi kerak
+            </div>
+          </section>
+
+          <section id="workers" class="mt-5">
+            <h2><i class="bi bi-people"></i> Xodimlar Boshqaruvi</h2>
+            <p>
+              Xodimlar boshqaruvi tizimi xodimlar ro'yxatini ko'rsatadi va quyidagi ma'lumotlarni ko'rsatadi:
+            </p>
+            <ul class="features-list">
+              <li><i class="bi bi-check-circle"></i> Xodimning rasmi</li>
+              <li><i class="bi bi-check-circle"></i> F.I.O</li>
+              <li><i class="bi bi-check-circle"></i> Lavozimi</li>
+              <li><i class="bi bi-check-circle"></i> Harbiy unvoni</li>
+              <li><i class="bi bi-check-circle"></i> QK turi</li>
+            </ul>
+            <div class="alert alert-info">
+              <i class="bi bi-info-circle"></i>
+              <strong>Ma'lumot:</strong> Xodimlar ro'yxatini qidirish mumkin
+            </div>
+          </section>
+
+          <section id="settings" class="mt-5">
+            <h2><i class="bi bi-gear"></i> Sozlamalar</h2>
+            <p>Tizim quyidagi sozlamalarga ega:</p>
+            <ul class="features-list">
+              <li><i class="bi bi-check-circle"></i> Rejim (Kun/Kechki)</li>
+              <li><i class="bi bi-check-circle"></i> Ovozli xabarlar</li>
+              <li><i class="bi bi-check-circle"></i> Tasdiqlash natijalari</li>
+            </ul>
+            <div class="alert alert-success">
+              <i class="bi bi-check-circle"></i>
+              <strong>Ma'lumot:</strong> Sozlamalar barcha sahifalarda saqlanadi
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer mt-5 py-3 bg-light">
+      <div class="container text-center">
+        <span class="text-muted">&copy; 2025 Xodimlar Boshqaruvi Tizimi. Barcha huquqlar himoyalangan.</span>
+      </div>
+    </footer>
+
+    <script src="assets/packs/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

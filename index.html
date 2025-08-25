@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="uz">
+  <head>    
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Authentication App">
+    <title>Authentication Methods</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="manifest" href="manifest.json" />
+    <link href="assets/packs/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="assets/packs/css/font.css" rel="stylesheet" />
+    <link href="assets/packs/css/bootstrap-icons.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="assets/style/styles.css" />
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("/sw.js")
+            .then((registration) => {
+              console.log("ServiceWorker registration successful");
+            })
+            .catch((err) => {
+              console.log("ServiceWorker registration failed: ", err);
+            });
+        });
+      }
+    </script>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="index.html">
+          <i class="bi bi-people"></i> Xodimlar Boshqaruvi
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a class="nav-link active" href="index.html">Bosh sahifa</a></li>
+            <li class="nav-item"><a class="nav-link" href="faceid.html">FaceID</a></li>
+            <li class="nav-item"><a class="nav-link" href="qrcode.html">QR Kod</a></li>
+            <li class="nav-item"><a class="nav-link" href="workers.html">Xodimlar</a></li>
+            <li class="nav-item"><a class="nav-link" href="documentation.html">Qo'llanma</a></li>
+            <li class="nav-item"><a class="nav-link" href="settings.html">Sozlamalar</a></li>
+          </ul>
+          <button class="btn btn-outline-light ms-3" id="themeToggle">🌓</button>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container py-4">
+      <h1 class="text-center mb-5 fw-bold fade-in">
+        Autentifikatsiya Usullari
+      </h1>
+
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <div class="row">
+            <div class="col-md-6 mb-4">
+              <a href="faceid.html" class="text-decoration-none">
+                <div class="card auth-card shadow-lg fade-in" style="animation-delay: 0.2s">
+                  <div class="card-body p-4 text-center">
+                    <div class="auth-icon">👤</div>
+                    <h2 class="card-title text">FaceID</h2>
+                    <p class="card-text text">Yuz orqali autentifikatsiya</p>
+                  </div>
+                </div>
+              </a>
+            </div>
+            <div class="col-md-6 mb-4">
+              <a href="qrcode.html" class="text-decoration-none">
+                <div class="card auth-card shadow-lg fade-in" style="animation-delay: 0.4s">
+                  <div class="card-body p-4 text-center">
+                    <div class="auth-icon">📱</div>
+                    <h2 class="card-title text">QR Kod</h2>
+                    <p class="card-text text">QR kod orqali autentifikatsiya</p>
+                  </div>
+                </div>
+              </a>
+            </div>
+            <div class="col-md-6 mb-4">
+              <a href="workers.html" class="text-decoration-none">
+                <div class="card auth-card shadow-lg fade-in" style="animation-delay: 0.2s">
+                  <div class="card-body p-4 text-center">
+                    <div class="auth-icon">👮‍♂️</div>
+                    <h2 class="card-title text">Xodimlar</h2>
+                    <p class="card-text text">Xodimlar ro'yxati</p>
+                  </div>
+                </div>
+              </a>
+            </div>
+            <div class="col-md-6 mb-4">
+              <a href="documentation.html" class="text-decoration-none">
+                <div class="card auth-card shadow-lg fade-in" style="animation-delay: 0.2s">
+                  <div class="card-body p-4 text-center">
+                    <div class="auth-icon">📖</div>
+                    <h2 class="card-title text">Qo'llanma</h2>
+                    <p class="card-text text">Ilovani ishlatish bo'yicha yo'riqnoma</p>
+                  </div>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer mt-5 py-3 bg-light">
+      <div class="container text-center">
+        <span class="text-muted">&copy; 2025 Xodimlar Boshqaruvi Tizimi. Barcha huquqlar himoyalangan.</span>
+      </div>
+    </footer>
+
+    <script src="assets/packs/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/index.js"></script>
+  </body>
+</html>
