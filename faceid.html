@@ -11,7 +11,333 @@
     <link href="assets/packs/css/font.css" rel="stylesheet" />
     <link href="assets/packs/css/bootstrap-icons.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="assets/style/styles.css" />
+    <link rel="stylesheet" href="assets/style/faceid.css" />
     <script src="assets/packs/js/face-api.js"></script>
+    <style>
+      /* Enhanced FaceID specific styles */
+      .faceid-container {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        position: relative;
+        overflow: hidden;
+      }
+      
+      .faceid-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+        z-index: 0;
+      }
+      
+      .main-content {
+        position: relative;
+        z-index: 1;
+      }
+      
+      .faceid-header {
+        text-align: center;
+        padding: 2rem 0;
+        color: white;
+      }
+      
+      .faceid-title {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(45deg, #fff, #e3f2fd);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      }
+      
+      .faceid-subtitle {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        margin-bottom: 0;
+      }
+      
+      .camera-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border-radius: 25px;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        overflow: hidden;
+        transition: all 0.3s ease;
+      }
+      
+      .camera-preview {
+        position: relative;
+        border-radius: 20px;
+        overflow: hidden;
+        background: #000;
+        aspect-ratio: 16/9;
+        max-height: 400px;
+      }
+      
+      .scanning-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        pointer-events: none;
+        z-index: 10;
+      }
+      
+      .scan-line {
+        position: absolute;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #00ff88, transparent);
+        animation: scan 2s linear infinite;
+        opacity: 0;
+      }
+      
+      .scanning .scan-line {
+        opacity: 1;
+      }
+      
+      @keyframes scan {
+        0% { top: 0; }
+        100% { top: 100%; }
+      }
+      
+      .corner-frames {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        right: 20px;
+        bottom: 20px;
+        pointer-events: none;
+        z-index: 5;
+      }
+      
+      .corner {
+        position: absolute;
+        width: 40px;
+        height: 40px;
+        border: 3px solid #00ff88;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+      
+      .scanning .corner {
+        opacity: 1;
+      }
+      
+      .corner.top-left {
+        top: 0;
+        left: 0;
+        border-right: none;
+        border-bottom: none;
+      }
+      
+      .corner.top-right {
+        top: 0;
+        right: 0;
+        border-left: none;
+        border-bottom: none;
+      }
+      
+      .corner.bottom-left {
+        bottom: 0;
+        left: 0;
+        border-right: none;
+        border-top: none;
+      }
+      
+      .corner.bottom-right {
+        bottom: 0;
+        right: 0;
+        border-left: none;
+        border-top: none;
+      }
+      
+      .status-indicator {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #dc3545;
+        z-index: 15;
+        transition: background-color 0.3s ease;
+      }
+      
+      .status-indicator.active {
+        background: #28a745;
+        animation: pulse 1.5s infinite;
+      }
+      
+      @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); }
+        70% { box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+      }
+      
+      .control-panel {
+        padding: 2rem;
+        text-align: center;
+      }
+      
+      .status-message {
+        margin: 1.5rem 0;
+        padding: 1rem 1.5rem;
+        border-radius: 15px;
+        font-weight: 500;
+        min-height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+      }
+      
+      .loading-spinner {
+        width: 24px;
+        height: 24px;
+        border: 3px solid transparent;
+        border-top: 3px solid currentColor;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-right: 10px;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      .action-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      
+      .btn-modern {
+        padding: 12px 30px;
+        border-radius: 25px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border: none;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+      
+      .btn-modern::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s ease;
+      }
+      
+      .btn-modern:hover::before {
+        left: 100%;
+      }
+      
+      .btn-primary-modern {
+        background: linear-gradient(45deg, #007bff, #0056b3);
+        color: white;
+      }
+      
+      .btn-success-modern {
+        background: linear-gradient(45deg, #28a745, #1e7e34);
+        color: white;
+      }
+      
+      .worker-display {
+        display: none;
+        animation: slideInUp 0.5s ease;
+      }
+      
+      @keyframes slideInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      
+      .worker-card-modern {
+        background: rgba(255, 255, 255, 0.98);
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+      }
+      
+      .worker-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        border: 4px solid #28a745;
+        object-fit: cover;
+        margin: 0 auto 1rem;
+      }
+      
+      .success-badge {
+        background: linear-gradient(45deg, #28a745, #20c997);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        display: inline-block;
+      }
+      
+      /* Ensure navigation is clickable */
+      .navbar {
+        pointer-events: auto !important;
+      }
+      
+      .navbar-nav .nav-link {
+        pointer-events: auto !important;
+        cursor: pointer !important;
+        position: relative;
+        z-index: 1001;
+      }
+      
+      .navbar-brand {
+        pointer-events: auto !important;
+        cursor: pointer !important;
+        position: relative;
+        z-index: 1001;
+      }
+      
+      @media (max-width: 768px) {
+        .faceid-title {
+          font-size: 2rem;
+        }
+        
+        .camera-preview {
+          aspect-ratio: 4/3;
+        }
+        
+        .control-panel {
+          padding: 1rem;
+        }
+        
+        .action-buttons {
+          flex-direction: column;
+        }
+      }
+    </style>
     <script>
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
@@ -28,68 +354,135 @@
     </script>
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="index.html">
-          <i class="bi bi-people"></i> Xodimlar Boshqaruvi
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ms-auto">
-            <li class="nav-item"><a class="nav-link" href="index.html">Bosh sahifa</a></li>
-            <li class="nav-item"><a class="nav-link active" href="faceid.html">FaceID</a></li>
-            <li class="nav-item"><a class="nav-link" href="qrcode.html">QR Kod</a></li>
-            <li class="nav-item"><a class="nav-link" href="workers.html">Xodimlar</a></li>
-            <li class="nav-item"><a class="nav-link" href="documentation.html">Qo'llanma</a></li>
-            <li class="nav-item"><a class="nav-link" href="settings.html">Sozlamalar</a></li>
-          </ul>
-          <button class="btn btn-outline-light ms-3" id="themeToggle">🌓</button>
+    <div class="faceid-container">
+      <!-- Navigation -->
+      <nav class="navbar navbar-expand-lg navbar-dark" style="background: rgba(0,0,0,0.1); backdrop-filter: blur(10px); position: relative; z-index: 1000;">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="index.html">
+            <i class="bi bi-shield-check"></i> Xodimlar Boshqaruvi
+          </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+              <li class="nav-item"><a class="nav-link" href="index.html">Bosh sahifa</a></li>
+              <li class="nav-item"><a class="nav-link active" href="faceid.html">FaceID</a></li>
+              <li class="nav-item"><a class="nav-link" href="qrcode.html">QR Kod</a></li>
+              <li class="nav-item"><a class="nav-link" href="workers.html">Xodimlar</a></li>
+              <li class="nav-item"><a class="nav-link" href="documentation.html">Qo'llanma</a></li>
+            </ul>
+
+          </div>
         </div>
-      </div>
-    </nav>
+      </nav>
 
-    <main class="container py-4">
-      <div class="home-button">
-        <a href="index.html" class="btn btn-outline-primary">
-          <i class="fas fa-home"></i> O'rtaga qaytish
-        </a>
-      </div>
+      <!-- Main Content -->
+      <div class="main-content">
+        <!-- Header -->
+        <div class="faceid-header">
+          <h1 class="faceid-title">
+            <i class="bi bi-person-check me-3"></i>
+            FaceID Authentication
+          </h1>
+          <p class="faceid-subtitle">Yuzni tanish orqali xavfsiz kirish tizimi</p>
+        </div>
 
-      <div class="container card border-0">
-        <h1 class="text-center mb-5 fw-bold fade-in">FaceID Authentication</h1>
+        <!-- Main Interface -->
+        <div class="container">
+          <div class="row justify-content-center">
+            <div class="col-lg-8 col-xl-6">
+              <!-- Camera Card -->
+              <div class="camera-card">
+                <!-- Camera Preview Area -->
+                <div class="camera-preview" id="cameraPreview">
+                  <div class="status-indicator" id="statusIndicator"></div>
+                  
+                  <!-- Face detection container -->
+                  <div id="faceContainer" style="display: block; width: 100%; height: 100%;">
+                    <video id="faceVideo" autoplay muted playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
+                    <canvas id="faceCanvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></canvas>
+                  </div>
 
-        <div class="row justify-content-center">
-          <div class="col-lg-8">
-            <div class="card auth-card shadow-lg fade-in">
-              <div class="card-body p-4">
-                <div id="faceContainer" style="display: block" class="mb-4">
-                  <video id="faceVideo" autoplay muted playsinline></video>
-                  <canvas id="faceCanvas"></canvas>
+                  <!-- Scanning Overlay -->
+                  <div class="scanning-overlay" id="scanningOverlay">
+                    <div class="scan-line"></div>
+                    <div class="corner-frames">
+                      <div class="corner top-left"></div>
+                      <div class="corner top-right"></div>
+                      <div class="corner bottom-left"></div>
+                      <div class="corner bottom-right"></div>
+                    </div>
+                  </div>
                 </div>
-                <div id="workerCardContainer" class="col" style="display: none"></div>
-                <div class="text-center">
-                  <div class="btn-group mb-3">
-                    <button id="refreshButton" class="btn btn-primary d-none">
-                      <i class="bi bi-arrow-clockwise"></i> Qayta tekshirish
+
+                <!-- Control Panel -->
+                <div class="control-panel">
+                  <!-- Status Message -->
+                  <div class="status-message alert alert-info" id="faceResult" role="alert">
+                    <div class="loading-spinner"></div>
+                    Sistema yuklanmoqda...
+                  </div>
+
+                  <!-- Action Buttons -->
+                  <div class="action-buttons">
+                    <button id="refreshButton" class="btn btn-modern btn-primary-modern d-none">
+                      <i class="bi bi-arrow-clockwise me-2"></i>
+                      Qayta tekshirish
+                    </button>
+                    <button id="settingsButton" class="btn btn-modern btn-outline-secondary d-none">
+                      <i class="bi bi-gear me-2"></i>
+                      Sozlamalar
                     </button>
                   </div>
-                  <div id="faceResult" class="alert" role="alert"></div>
+                </div>
+              </div>
+
+              <!-- Worker Display Card -->
+              <div id="workerCardContainer" class="worker-display mt-4">
+                <!-- Worker information will be injected here -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Instructions -->
+          <div class="row justify-content-center mt-4">
+            <div class="col-lg-8 col-xl-6">
+              <div class="card" style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); border-radius: 15px;">
+                <div class="card-body text-center text-white">
+                  <h5 class="card-title">
+                    <i class="bi bi-info-circle me-2"></i>
+                    Qo'llanma
+                  </h5>
+                  <div class="row">
+                    <div class="col-md-4 mb-3">
+                      <i class="bi bi-1-circle-fill h2 d-block mb-2" style="color: #00ff88;"></i>
+                      <small>Kamera oldida to'g'ri joylashtiring</small>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                      <i class="bi bi-2-circle-fill h2 d-block mb-2" style="color: #00ff88;"></i>
+                      <small>Yuzingizni to'liq ko'rsating</small>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                      <i class="bi bi-3-circle-fill h2 d-block mb-2" style="color: #00ff88;"></i>
+                      <small>Tanish jarayonini kuting</small>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </main>
 
-    <footer class="footer mt-5 py-3 bg-light">
-      <div class="container text-center">
-        <span class="text-muted">&copy; 2025 Xodimlar Boshqaruvi Tizimi. Barcha huquqlar himoyalangan.</span>
-      </div>
-    </footer>
-
+      
+    </div>
+    <div style="position: fixed; bottom: 20px; left: 20px; z-index: 1000;">
+      <a href="index.html" class="btn btn-light" style="border-radius: 25px; padding: 10px 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+        <i class="bi bi-house-fill me-2"></i>
+        Bosh sahifa
+      </a>
+    </div>
     <script src="assets/packs/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/faceid.js"></script>
   </body>

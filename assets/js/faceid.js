@@ -1,24 +1,5 @@
-// Dark mode toggle
-const themeToggle = document.getElementById("themeToggle");
-const body = document.body;
-
-// Check for saved theme preference
-const savedTheme = localStorage.getItem("theme");
-if (savedTheme === "dark") {
-  body.classList.add("dark-mode");
-  themeToggle.textContent = "";
-}
-
-themeToggle.addEventListener("click", () => {
-  body.classList.toggle("dark-mode");
-  if (body.classList.contains("dark-mode")) {
-    themeToggle.textContent = "";
-    localStorage.setItem("theme", "dark");
-  } else {
-    themeToggle.textContent = "";
-    localStorage.setItem("theme", "light");
-  }
-});
+// FaceID functionality
+// All theme toggle functionality has been removed
 
 // IndexDB setup
 let db;
@@ -55,6 +36,9 @@ const refreshButton = document.getElementById("refreshButton");
 const faceResult = document.getElementById("faceResult");
 const faceVideo = document.getElementById("faceVideo");
 const faceCanvas = document.getElementById("faceCanvas");
+const statusIndicator = document.getElementById("statusIndicator");
+const scanningOverlay = document.getElementById("scanningOverlay");
+const cameraPreview = document.getElementById("cameraPreview");
 
 let modelsLoaded = false;
 let videoReady = false;
@@ -64,6 +48,22 @@ let faceDetectionInterval;
 let currentStream = null;
 let hasCameraPermission = false;
 let audioPlayed = false; // Track if audio has been played
+
+// UI Helper Functions
+function setStatusIndicator(active) {
+  if (statusIndicator) {
+    statusIndicator.classList.toggle('active', active);
+  }
+}
+
+function setScanningState(scanning) {
+  if (scanningOverlay) {
+    scanningOverlay.classList.toggle('scanning', scanning);
+  }
+  if (cameraPreview) {
+    cameraPreview.classList.toggle('scanning', scanning);
+  }
+}
 
 // Kamera ruxsatini olish
 async function requestCameraPermission() {
@@ -160,9 +160,12 @@ async function restartCamera() {
 
     updateResultMessage(
       faceResult,
-      "Kamera muvaffaqiyatli yoqildi. Yuzni aniqlash kutilmoqda...",
+      "Kamera tayyor. Yuzingizni kameraga ko'rsating...",
       true
     );
+
+    // Set scanning state
+    setScanningState(true);
 
     // Clear any existing interval
     if (faceDetectionInterval) {
@@ -182,15 +185,21 @@ async function restartCamera() {
           .withFaceLandmarks();
 
         if (detection) {
-          faceVideo.style.borderColor = "#198754";
+          updateResultMessage(faceResult, "Yuz aniqlandi! Tekshirilmoqda...", false, true);
+          setScanningState(false);
+          setStatusIndicator(true);
           isAuthenticating = true;
           await startFaceAuthentication();
         } else {
-          faceVideo.style.borderColor = "#dc3545";
+          if (!isAuthenticating) {
+            setScanningState(true);
+            setStatusIndicator(false);
+          }
         }
       } catch (error) {
         console.error("Face detection error:", error);
-        faceVideo.style.borderColor = "#dc3545";
+        setScanningState(false);
+        setStatusIndicator(false);
       }
     }, 1000);
   } catch (err) {
@@ -207,6 +216,8 @@ async function restartCamera() {
 // Load face-api.js models
 async function loadModels() {
   try {
+    updateResultMessage(faceResult, "AI modellar yuklanmoqda...", false, true);
+    
     const modelPath = "assets/models/";
     await faceapi.nets.tinyFaceDetector.load(
       modelPath
@@ -225,16 +236,22 @@ async function loadModels() {
       // + "ssd_mobilenetv1_model-weights_manifest.json"
     );
     modelsLoaded = true;
-    updateResultMessage(faceResult, "Modellar yuklanmoqda...", true);
+    updateResultMessage(faceResult, "Modellar yuklandi. Kamera ishga tushirilmoqda...", false, true);
     await restartCamera();
   } catch (error) {
     console.error("Model yuklashda xatolik:", error);
+    updateResultMessage(faceResult, "Model yuklashda xatolik. Qayta urinilmoqda...", false, true);
     setTimeout(loadModels, 2000);
   }
 }
 
 // Initialize models on page load
 document.addEventListener("DOMContentLoaded", () => {
+  // Set initial UI state
+  setScanningState(false);
+  setStatusIndicator(false);
+  updateResultMessage(faceResult, "Sistema ishga tushirilmoqda...", false, true);
+  
   loadModels();
 });
 
@@ -279,8 +296,13 @@ refreshButton.addEventListener("click", async (e) => {
   // Reset authentication state
   isAuthenticating = false;
   audioPlayed = false; // Reset audio played flag
+  
+  // Reset UI state
+  setScanningState(false);
+  setStatusIndicator(false);
 
   try {
+    updateResultMessage(faceResult, "Qayta ishga tushirilmoqda...", false, true);
     await restartCamera();
   } catch (err) {
     console.error("Refresh button error:", err);
@@ -289,6 +311,8 @@ refreshButton.addEventListener("click", async (e) => {
       "Kamerani qayta ishga tushirishda xatolik yuz berdi",
       false
     );
+    setScanningState(false);
+    setStatusIndicator(false);
   }
 });
 
@@ -382,43 +406,75 @@ async function startFaceAuthentication() {
 
         if (isMatch && matchPercentage > 60) {
           const worker = bestMatch.worker;
+          
+          // Stop scanning and show success
+          setScanningState(false);
+          setStatusIndicator(true);
+          
           updateResultMessage(
             faceResult,
-            `Yuz tasdiqlandi! Xush kelibsiz, ${worker.name}! (Lavozim: ${worker.position}, Harbiy unvon: ${worker.militaryRank}, QK turi: ${worker.qkType}, Moslik: ${matchPercentage}%)`,
+            `✅ Autentifikatsiya muvaffaqiyatli! Xush kelibsiz, ${worker.name}!`,
             true
           );
+          
           const workerCard = `
-            <div class="d-flex align-items-center justify-content-center" style="width: 100%;">
-              <div class="card worker-card mb-4 border-0 shadow-sm flex-grow-1" style="width: 100%;">
-                <div class="row g-0 align-items-center">
-                  <div class="col-md-3 text-center">
-                    <img
-                      src="${worker.image}"
-                      class="img-fluid rounded-circle"
-                      alt="${worker.name}"
-                    />
-                  </div>
-                  <div class="col-md-6">
-                    <div class="card-body text-center">
-                      <h5 class="card-title">F.I.SH: ${worker.name}</h5>
-                      <p class="card-text">
-                        <span class="badge bg-primary">Lavozim: ${worker.position}</span>
-                        <span class="badge bg-secondary">Harbiy unvon: ${worker.militaryRank}</span>
-                      </p>
-                      <img
-                        src="assets/logos/${worker.qkType}.png"
-                        alt="${worker.qkType}"
-                        class="img-fluid qk-logo"
-                      />
+            <div class="worker-card-modern">
+              <div class="card-body text-center p-4">
+                <div class="success-badge mb-3">
+                  <i class="bi bi-check-circle-fill me-2"></i>
+                  Tasdiqlandi • ${matchPercentage}% moslik
+                </div>
+                
+                <img
+                  src="${worker.image}"
+                  class="worker-avatar"
+                  alt="${worker.name}"
+                />
+                
+                <h3 class="card-title mb-3">${worker.name}</h3>
+                
+                <div class="row text-center mb-3">
+                  <div class="col-md-6 mb-2">
+                    <div class="badge bg-primary fs-6 p-2">
+                      <i class="bi bi-person-badge me-1"></i>
+                      ${worker.position}
                     </div>
                   </div>
+                  <div class="col-md-6 mb-2">
+                    <div class="badge bg-success fs-6 p-2">
+                      <i class="bi bi-award me-1"></i>
+                      ${worker.militaryRank}
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="d-flex justify-content-center align-items-center">
+                  <img
+                    src="assets/logos/${worker.qkType}.png"
+                    alt="${worker.qkType}"
+                    class="img-fluid"
+                    style="max-width: 80px; max-height: 80px; border-radius: 10px;"
+                  />
+                  <div class="ms-3 text-start">
+                    <small class="text-muted d-block">QK turi</small>
+                    <strong>${worker.qkType}</strong>
+                  </div>
+                </div>
+                
+                <div class="mt-3 text-muted">
+                  <small>
+                    <i class="bi bi-clock me-1"></i>
+                    ${new Date().toLocaleString('uz-UZ')}
+                  </small>
                 </div>
               </div>
             </div>
           `;
-          document.getElementById("workerCardContainer").innerHTML = workerCard;
-          document.getElementById("workerCardContainer").style.display =
-            "block";
+          
+          const workerContainer = document.getElementById("workerCardContainer");
+          workerContainer.innerHTML = workerCard;
+          workerContainer.style.display = "block";
+          workerContainer.classList.add("worker-display");
 
           // Hide face container
           document.getElementById("faceContainer").style.display = "none";
@@ -443,12 +499,15 @@ async function startFaceAuthentication() {
           // Show refresh button
           refreshButton.classList.remove("d-none");
         } else {
+          // Stop scanning and show failure
+          setScanningState(false);
+          setStatusIndicator(false);
+          
           updateResultMessage(
             faceResult,
-            `Yuz tanilmadi. Eng yaqin moslik: ${matchPercentage}%. Iltimos, ro'yxatdan o'ting.`,
+            `❌ Yuz tanilmadi. Eng yaqin moslik: ${matchPercentage}%. Iltimos, ro'yxatdan o'ting yoki qayta urinib ko'ring.`,
             false
           );
-          faceVideo.style.borderColor = "#dc3545";
 
           // Stop face detection
           if (faceDetectionInterval) {
@@ -512,16 +571,39 @@ async function startFaceAuthentication() {
   }
 }
 
-// Update result message styling
-function updateResultMessage(element, text, isSuccess) {
-  element.textContent = text;
+// Update result message styling with enhanced UI
+function updateResultMessage(element, text, isSuccess, showSpinner = false) {
+  if (!element) return;
+  
+  // Clear existing content
+  element.innerHTML = '';
+  
+  // Add spinner if needed
+  if (showSpinner) {
+    const spinner = document.createElement('div');
+    spinner.className = 'loading-spinner';
+    element.appendChild(spinner);
+  }
+  
+  // Add text
+  const textNode = document.createTextNode(text);
+  element.appendChild(textNode);
+  
   if (text) {
     element.classList.remove("d-none");
-    element.classList.remove("alert-success", "alert-danger");
-    element.classList.add(isSuccess ? "alert-success" : "alert-danger");
+    element.classList.remove("alert-success", "alert-danger", "alert-info", "alert-warning");
+    
+    if (showSpinner) {
+      element.classList.add("alert-info");
+    } else {
+      element.classList.add(isSuccess ? "alert-success" : "alert-danger");
+    }
   } else {
     element.classList.add("d-none");
   }
+  
+  // Update status indicator
+  setStatusIndicator(isSuccess && !showSpinner);
 }
 
 // Sahifa yopilganda kamerani to'xtatish

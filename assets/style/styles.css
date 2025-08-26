@@ -34,15 +34,6 @@ body {
   transition: all var(--transition-speed) ease;
 }
 
-body.dark-mode {
-  background: linear-gradient(
-    135deg,
-    var(--primary-color-dark) 0%,
-    var(--secondary-color-dark) 100%
-  );
-  color: var(--text-color-dark);
-}
-
 /* Video elementlari uchun umumiy stillar */
 .video-container {
   width: 70%;
@@ -51,10 +42,6 @@ body.dark-mode {
   border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-light);
   transition: all var(--transition-speed) ease;
-}
-
-.dark-mode .video-container {
-  box-shadow: var(--shadow-dark);
 }
 
 #faceContainer {
@@ -71,11 +58,6 @@ body.dark-mode {
   border-radius: var(--border-radius-lg);
   transition: all var(--transition-speed) ease;
   border: 3px solid var(--accent-color-light);
-}
-
-.dark-mode #faceVideo,
-.dark-mode #video {
-  border-color: var(--accent-color-dark);
 }
 
 #faceCanvas {
@@ -98,9 +80,7 @@ body.dark-mode {
   position: relative;
 }
 
-.dark-mode .auth-card {
-  background: rgba(45, 52, 54, 0.95);
-}
+
 
 .auth-card::before {
   content: "";
@@ -128,9 +108,7 @@ body.dark-mode {
   box-shadow: var(--shadow-light);
 }
 
-.dark-mode .auth-card:hover {
-  box-shadow: var(--shadow-dark);
-}
+
 
 .auth-icon {
   font-size: 3.5rem;
@@ -158,9 +136,7 @@ body.dark-mode {
   box-shadow: var(--shadow-light);
 }
 
-.dark-mode .btn:hover {
-  box-shadow: var(--shadow-dark);
-}
+
 
 /* Tipografiya */
 h1,
@@ -211,10 +187,7 @@ h6 {
   animation: spin 1s linear infinite;
 }
 
-.dark-mode .spinner {
-  border-color: var(--border-color-dark);
-  border-top-color: var(--accent-color-dark);
-}
+
 
 @keyframes spin {
   0% {
@@ -228,30 +201,11 @@ body {
   font-family: "Inter", sans-serif;
 }
 
-.theme-toggle {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 1000;
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  padding: 10px;
-  border-radius: 50%;
-  transition: all 0.3s ease;
-  width: 50px;
-  height: 50px;
+
+
 }
 
-.theme-toggle:hover {
-  transform: scale(1.1);
-  background: rgba(0, 0, 0, 0.1);
-}
 
-.dark-mode .theme-toggle {
-  color: var(--text-color-dark);
-}
 
 .auth-card {
   height: 300px;
@@ -271,11 +225,7 @@ body {
   -webkit-text-fill-color: transparent;
 }
 
-.dark-mode .auth-icon {
-  background: linear-gradient(45deg, var(--accent-color-dark), #00b894);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
+
 
 .card-title {
   font-size: 1.5rem;
@@ -301,8 +251,4 @@ h1 {
   -webkit-text-fill-color: transparent;
 }
 
-.dark-mode h1 {
-  background: linear-gradient(45deg, var(--accent-color-dark), #00b894);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
+

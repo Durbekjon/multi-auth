@@ -1,16 +1,136 @@
 <!DOCTYPE html>
 <html lang="uz">
-  <head>    
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
-<meta name="apple-mobile-web-app-title" content="Authentication App">
-    <title>Authentication Methods</title>
+  <head>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="apple-mobile-web-app-title" content="Authentication App" />
+    <title>Xodimlar Boshqaruvi - Bosh sahifa</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="manifest" href="manifest.json" />
     <link href="assets/packs/css/bootstrap.min.css" rel="stylesheet" />
     <link href="assets/packs/css/font.css" rel="stylesheet" />
     <link href="assets/packs/css/bootstrap-icons.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="assets/style/styles.css" />
+    <style>
+      /* Index page specific styles */
+      .index-container {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        position: relative;
+        overflow: hidden;
+      }
+      
+      .index-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+        z-index: 0;
+      }
+      
+      .main-content {
+        position: relative;
+        z-index: 1;
+      }
+      
+      .index-header {
+        text-align: center;
+        padding: 2rem 0;
+        color: white;
+      }
+      
+      .index-title {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(45deg, #fff, #e3f2fd);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      }
+      
+      .index-subtitle {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        margin-bottom: 0;
+      }
+      
+      .auth-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border-radius: 25px;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        overflow: hidden;
+        transition: all 0.3s ease;
+        height: 100%;
+        text-decoration: none;
+        color: inherit;
+      }
+      
+      .auth-card:hover {
+        transform: translateY(-10px) scale(1.02);
+        box-shadow: 0 35px 70px rgba(0, 0, 0, 0.35);
+      }
+      
+      .auth-icon {
+        font-size: 4rem;
+        margin-bottom: 1.5rem;
+        transition: transform 0.3s ease;
+      }
+      
+      .auth-card:hover .auth-icon {
+        transform: scale(1.1);
+      }
+      
+      .card-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: #2c3e50;
+      }
+      
+      .card-text {
+        font-size: 1rem;
+        opacity: 0.8;
+        color: #34495e;
+      }
+      
+      /* Ensure navigation is clickable */
+      .navbar {
+        pointer-events: auto !important;
+        position: relative;
+        z-index: 1000;
+      }
+      
+      .navbar-nav .nav-link {
+        pointer-events: auto !important;
+        cursor: pointer !important;
+        position: relative;
+        z-index: 1001;
+      }
+      
+      .navbar-brand {
+        pointer-events: auto !important;
+        cursor: pointer !important;
+        position: relative;
+        z-index: 1001;
+      }
+      
+      @media (max-width: 768px) {
+        .index-title {
+          font-size: 2rem;
+        }
+        
+        .auth-card {
+          margin-bottom: 1rem;
+        }
+      }
+    </style>
     <script>
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
@@ -27,90 +147,131 @@
     </script>
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="index.html">
-          <i class="bi bi-people"></i> Xodimlar Boshqaruvi
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ms-auto">
-            <li class="nav-item"><a class="nav-link active" href="index.html">Bosh sahifa</a></li>
-            <li class="nav-item"><a class="nav-link" href="faceid.html">FaceID</a></li>
-            <li class="nav-item"><a class="nav-link" href="qrcode.html">QR Kod</a></li>
-            <li class="nav-item"><a class="nav-link" href="workers.html">Xodimlar</a></li>
-            <li class="nav-item"><a class="nav-link" href="documentation.html">Qo'llanma</a></li>
-            <li class="nav-item"><a class="nav-link" href="settings.html">Sozlamalar</a></li>
-          </ul>
-          <button class="btn btn-outline-light ms-3" id="themeToggle">🌓</button>
+    <div class="index-container">
+      <!-- Navigation -->
+      <nav class="navbar navbar-expand-lg navbar-dark" style="background: rgba(0,0,0,0.1); backdrop-filter: blur(10px);">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="index.html">
+            <i class="bi bi-shield-check"></i> Xodimlar Boshqaruvi
+          </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+              <li class="nav-item"><a class="nav-link active" href="index.html">Bosh sahifa</a></li>
+              <li class="nav-item"><a class="nav-link" href="faceid.html">FaceID</a></li>
+              <li class="nav-item"><a class="nav-link" href="qrcode.html">QR Kod</a></li>
+              <li class="nav-item"><a class="nav-link" href="workers.html">Xodimlar</a></li>
+              <li class="nav-item"><a class="nav-link" href="documentation.html">Qo'llanma</a></li>
+            </ul>
+
+          </div>
         </div>
-      </div>
-    </nav>
+      </nav>
 
-    <main class="container py-4">
-      <h1 class="text-center mb-5 fw-bold fade-in">
-        Autentifikatsiya Usullari
-      </h1>
+      <!-- Main Content -->
+      <div class="main-content">
+        <!-- Header -->
+        <div class="index-header">
+          <h1 class="index-title">
+            <i class="bi bi-shield-lock me-3"></i>
+            Xodimlar Boshqaruvi Tizimi
+          </h1>
+          <p class="index-subtitle">Xavfsiz autentifikatsiya va boshqaruv tizimi</p>
+        </div>
 
-      <div class="row justify-content-center">
-        <div class="col-lg-8">
-          <div class="row">
-            <div class="col-md-6 mb-4">
-              <a href="faceid.html" class="text-decoration-none">
-                <div class="card auth-card shadow-lg fade-in" style="animation-delay: 0.2s">
-                  <div class="card-body p-4 text-center">
-                    <div class="auth-icon">👤</div>
-                    <h2 class="card-title text">FaceID</h2>
-                    <p class="card-text text">Yuz orqali autentifikatsiya</p>
-                  </div>
+        <!-- Main Interface -->
+        <div class="container">
+          <div class="row justify-content-center">
+            <div class="col-lg-10">
+              <div class="row">
+                <div class="col-md-6 mb-4">
+                  <a href="faceid.html" class="text-decoration-none">
+                    <div class="auth-card">
+                      <div class="card-body p-4 text-center">
+                        <div class="auth-icon">
+                          <i class="bi bi-person-check" style="color: #007bff;"></i>
+                        </div>
+                        <h2 class="card-title">FaceID</h2>
+                        <p class="card-text">Yuz orqali autentifikatsiya</p>
+                      </div>
+                    </div>
+                  </a>
                 </div>
-              </a>
+                <div class="col-md-6 mb-4">
+                  <a href="qrcode.html" class="text-decoration-none">
+                    <div class="auth-card">
+                      <div class="card-body p-4 text-center">
+                        <div class="auth-icon">
+                          <i class="bi bi-qr-code-scan" style="color: #28a745;"></i>
+                        </div>
+                        <h2 class="card-title">QR Kod</h2>
+                        <p class="card-text">QR kod orqali autentifikatsiya</p>
+                      </div>
+                    </div>
+                  </a>
+                </div>
+                <div class="col-md-6 mb-4">
+                  <a href="workers.html" class="text-decoration-none">
+                    <div class="auth-card">
+                      <div class="card-body p-4 text-center">
+                        <div class="auth-icon">
+                          <i class="bi bi-people-fill" style="color: #6f42c1;"></i>
+                        </div>
+                        <h2 class="card-title">Xodimlar</h2>
+                        <p class="card-text">Xodimlar ro'yxati va boshqaruvi</p>
+                      </div>
+                    </div>
+                  </a>
+                </div>
+                <div class="col-md-6 mb-4">
+                  <a href="documentation.html" class="text-decoration-none">
+                    <div class="auth-card">
+                      <div class="card-body p-4 text-center">
+                        <div class="auth-icon">
+                          <i class="bi bi-book-fill" style="color: #fd7e14;"></i>
+                        </div>
+                        <h2 class="card-title">Qo'llanma</h2>
+                        <p class="card-text">Ilovani ishlatish bo'yicha yo'riqnoma</p>
+                      </div>
+                    </div>
+                  </a>
+                </div>
+              </div>
             </div>
-            <div class="col-md-6 mb-4">
-              <a href="qrcode.html" class="text-decoration-none">
-                <div class="card auth-card shadow-lg fade-in" style="animation-delay: 0.4s">
-                  <div class="card-body p-4 text-center">
-                    <div class="auth-icon">📱</div>
-                    <h2 class="card-title text">QR Kod</h2>
-                    <p class="card-text text">QR kod orqali autentifikatsiya</p>
+          </div>
+
+          <!-- Features Section -->
+          <div class="row justify-content-center mt-5">
+            <div class="col-lg-8">
+              <div class="card" style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); border-radius: 15px;">
+                <div class="card-body text-center text-white">
+                  <h5 class="card-title text-white">
+                    <i class="bi bi-star-fill me-2"></i>
+                    Tizim Xususiyatlari
+                  </h5>
+                  <div class="row">
+                    <div class="col-md-4 mb-3">
+                      <i class="bi bi-shield-check h2 d-block mb-2" style="color: #00ff88;"></i>
+                      <small>Xavfsiz autentifikatsiya</small>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                      <i class="bi bi-speedometer2 h2 d-block mb-2" style="color: #00ff88;"></i>
+                      <small>Tezkor ishlash</small>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                      <i class="bi bi-phone h2 d-block mb-2" style="color: #00ff88;"></i>
+                      <small>Mobil moslik</small>
+                    </div>
                   </div>
                 </div>
-              </a>
-            </div>
-            <div class="col-md-6 mb-4">
-              <a href="workers.html" class="text-decoration-none">
-                <div class="card auth-card shadow-lg fade-in" style="animation-delay: 0.2s">
-                  <div class="card-body p-4 text-center">
-                    <div class="auth-icon">👮‍♂️</div>
-                    <h2 class="card-title text">Xodimlar</h2>
-                    <p class="card-text text">Xodimlar ro'yxati</p>
-                  </div>
-                </div>
-              </a>
-            </div>
-            <div class="col-md-6 mb-4">
-              <a href="documentation.html" class="text-decoration-none">
-                <div class="card auth-card shadow-lg fade-in" style="animation-delay: 0.2s">
-                  <div class="card-body p-4 text-center">
-                    <div class="auth-icon">📖</div>
-                    <h2 class="card-title text">Qo'llanma</h2>
-                    <p class="card-text text">Ilovani ishlatish bo'yicha yo'riqnoma</p>
-                  </div>
-                </div>
-              </a>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </main>
-
-    <footer class="footer mt-5 py-3 bg-light">
-      <div class="container text-center">
-        <span class="text-muted">&copy; 2025 Xodimlar Boshqaruvi Tizimi. Barcha huquqlar himoyalangan.</span>
-      </div>
-    </footer>
+    </div>
 
     <script src="assets/packs/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/index.js"></script>

@@ -4,7 +4,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <meta name="apple-mobile-web-app-title" content="Authentication App" />
-    <title>Ishchilar</title>
+    <title>Xodimlar Boshqaruvi - Ishchilar</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="manifest" href="manifest.json" />
     <link href="assets/packs/css/bootstrap.min.css" rel="stylesheet" />
@@ -14,7 +14,224 @@
     <script src="assets/packs/js/face-api.js"></script>
     <script src="assets/packs/js/qrcode.min.js"></script>
     <script src="assets/packs/js/qrcode1-4-4.min.js"></script>
-
+    <style>
+      /* Workers page specific styles */
+      .workers-container {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        position: relative;
+        overflow: hidden;
+      }
+      
+      .workers-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+        z-index: 0;
+      }
+      
+      .main-content {
+        position: relative;
+        z-index: 1;
+      }
+      
+      .workers-header {
+        text-align: center;
+        padding: 2rem 0;
+        color: white;
+      }
+      
+      .workers-title {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(45deg, #fff, #e3f2fd);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      }
+      
+      .workers-subtitle {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        margin-bottom: 0;
+      }
+      
+      .content-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border-radius: 25px;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        overflow: hidden;
+        transition: all 0.3s ease;
+      }
+      
+      .search-box {
+        position: relative;
+        margin-bottom: 2rem;
+      }
+      
+      .search-input {
+        width: 100%;
+        padding: 15px 50px 15px 20px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 25px;
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
+        font-size: 1rem;
+        transition: all 0.3s ease;
+      }
+      
+      .search-input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+      }
+      
+      .search-icon {
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #667eea;
+        font-size: 1.2rem;
+      }
+      
+      .btn-modern {
+        padding: 12px 30px;
+        border-radius: 25px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border: none;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+      
+      .btn-modern::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s ease;
+      }
+      
+      .btn-modern:hover::before {
+        left: 100%;
+      }
+      
+      .btn-primary-modern {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        color: white;
+      }
+      
+      .table {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 15px;
+        overflow: hidden;
+      }
+      
+      .table thead th {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        padding: 1rem;
+        font-weight: 600;
+      }
+      
+      .table tbody td {
+        padding: 1rem;
+        border-bottom: 1px solid rgba(0,0,0,0.1);
+        vertical-align: middle;
+      }
+      
+      .worker-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #667eea;
+      }
+      
+      .pagination-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+        margin-top: 2rem;
+      }
+      
+      .pagination-btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.9);
+        color: #667eea;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+      
+      .pagination-btn:hover:not(:disabled) {
+        background: #667eea;
+        color: white;
+        transform: translateY(-2px);
+      }
+      
+      .pagination-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      
+      .pagination-info {
+        color: white;
+        font-weight: 600;
+      }
+      
+      /* Ensure navigation is clickable */
+      .navbar {
+        pointer-events: auto !important;
+        position: relative;
+        z-index: 1000;
+      }
+      
+      .navbar-nav .nav-link {
+        pointer-events: auto !important;
+        cursor: pointer !important;
+        position: relative;
+        z-index: 1001;
+      }
+      
+      .navbar-brand {
+        pointer-events: auto !important;
+        cursor: pointer !important;
+        position: relative;
+        z-index: 1001;
+      }
+      
+      @media (max-width: 768px) {
+        .workers-title {
+          font-size: 2rem;
+        }
+        
+        .content-card {
+          margin: 1rem;
+        }
+        
+        .table-responsive {
+          border-radius: 15px;
+        }
+      }
+    </style>
     <script>
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
@@ -31,114 +248,131 @@
     </script>
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="index.html">
-          <i class="bi bi-people"></i> Xodimlar Boshqaruvi
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ms-auto">
-            <li class="nav-item"><a class="nav-link" href="index.html">Bosh sahifa</a></li>
-            <li class="nav-item"><a class="nav-link" href="faceid.html">FaceID</a></li>
-            <li class="nav-item"><a class="nav-link" href="qrcode.html">QR Kod</a></li>
-            <li class="nav-item"><a class="nav-link active" href="workers.html">Xodimlar</a></li>
-            <li class="nav-item"><a class="nav-link" href="documentation.html">Qo'llanma</a></li>
-            <li class="nav-item"><a class="nav-link" href="settings.html">Sozlamalar</a></li>
-          </ul>
-          <button class="btn btn-outline-light ms-3" id="themeToggle">🌓</button>
+    <div class="workers-container">
+      <!-- Navigation -->
+      <nav class="navbar navbar-expand-lg navbar-dark" style="background: rgba(0,0,0,0.1); backdrop-filter: blur(10px);">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="index.html">
+            <i class="bi bi-shield-check"></i> Xodimlar Boshqaruvi
+          </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+              <li class="nav-item"><a class="nav-link" href="index.html">Bosh sahifa</a></li>
+              <li class="nav-item"><a class="nav-link" href="faceid.html">FaceID</a></li>
+              <li class="nav-item"><a class="nav-link" href="qrcode.html">QR Kod</a></li>
+              <li class="nav-item"><a class="nav-link active" href="workers.html">Xodimlar</a></li>
+              <li class="nav-item"><a class="nav-link" href="documentation.html">Qo'llanma</a></li>
+            </ul>
+
+          </div>
         </div>
-      </div>
-    </nav>
+      </nav>
 
-    <main class="container py-4">
-      <div class="home-button">
-        <a href="index.html" class="btn btn-outline-primary">
-          <i class="bi bi-house-door"></i> O'rtaga qaytish
-        </a>
-      </div>
+      <!-- Main Content -->
+      <div class="main-content">
+        <!-- Header -->
+        <div class="workers-header">
+          <h1 class="workers-title">
+            <i class="bi bi-people-fill me-3"></i>
+            Xodimlar Boshqaruvi
+          </h1>
+          <p class="workers-subtitle">Xodimlar ro'yxati va boshqaruvi</p>
+        </div>
 
-      <div class="container">
-        <h1 class="text-center mb-5 fw-bold fade-in">Ishchilar</h1>
+        <!-- Main Interface -->
+        <div class="container">
+          <div class="content-card">
+            <div class="card-body p-4">
+              <!-- Search and Add Section -->
+              <div class="row justify-content-center mb-4">
+                <div class="col-lg-8">
+                  <div class="search-box">
+                    <input type="text" class="search-input" placeholder="Xodim qidirish..." id="searchInput" />
+                    <i class="bi bi-search search-icon"></i>
+                  </div>
+                </div>
+                <div class="col-lg-4 text-end">
+                  <button class="btn btn-modern btn-primary-modern" onclick="showAddWorkerModal()">
+                    <i class="bi bi-plus-lg me-2"></i>
+                    Yangi ishchi
+                  </button>
+                </div>
+              </div>
 
-        <div class="row justify-content-center mb-4">
-          <div class="col-lg-6">
-            <div class="loading-spinner" id="loadingSpinner"></div>
-            <div class="search-box">
-              <input type="text" class="search-input" placeholder="Qidirish..." id="searchInput" />
-              <i class="bi bi-search search-icon"></i>
+              <!-- Loading Spinner -->
+              <div class="text-center mb-4">
+                <div class="loading-spinner" id="loadingSpinner"></div>
+              </div>
+
+              <!-- Workers Table -->
+              <div class="table-responsive">
+                <table class="table table-hover">
+                  <thead>
+                    <tr>
+                      <th>Rasm</th>
+                      <th>F.I.O</th>
+                      <th>Lavozim</th>
+                      <th>Harbiy unvon</th>
+                      <th>QK turi</th>
+                      <th>Amallar</th>
+                    </tr>
+                  </thead>
+                  <tbody id="workersTableBody">
+                    <!-- Worker rows will be dynamically added here -->
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Pagination -->
+              <div class="pagination-container" id="paginationContainer">
+                <button class="pagination-btn" id="prevBtn" disabled>
+                  <i class="bi bi-chevron-left"></i> Oldingi
+                </button>
+                <span class="pagination-info" id="paginationInfo"></span>
+                <button class="pagination-btn" id="nextBtn">
+                  Keyingi <i class="bi bi-chevron-right"></i>
+                </button>
+              </div>
             </div>
           </div>
-          <div class="col-lg-2 text-end">
-            <button class="btn btn-primary" onclick="showAddWorkerModal()">
-              <i class="bi bi-plus-lg"></i> Yangi ishchi
-            </button>
-          </div>
-        </div>
-
-        <div class="row" id="workersContainer">
-          <div class="col-12">
-            <div class="table-responsive">
-              <table class="table table-hover">
-                <thead>
-                  <tr>
-                    <th>Rasm</th>
-                    <th>F.I.O</th>
-                    <th>Lavozim</th>
-                    <th>Harbiy unvon</th>
-                    <th>QK turi</th>
-                    <th>Amallar</th>
-                  </tr>
-                </thead>
-                <tbody id="workersTableBody">
-                  <!-- Worker rows will be dynamically added here -->
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <div class="pagination-container" id="paginationContainer">
-          <button class="pagination-btn" id="prevBtn" disabled>
-            <i class="bi bi-chevron-left"></i> Oldingi
-          </button>
-          <span class="pagination-info" id="paginationInfo"></span>
-          <button class="pagination-btn" id="nextBtn">
-            Keyingi <i class="bi bi-chevron-right"></i>
-          </button>
         </div>
       </div>
+    </div>
 
       <!-- Add Worker Modal -->
       <div class="modal fade" id="addWorkerModal" tabindex="-1" aria-labelledby="addWorkerModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="addWorkerModalLabel">Yangi ishchi qo'shish</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <div class="modal-content" style="border-radius: 20px; border: none; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);">
+            <div class="modal-header" style="background: linear-gradient(45deg, #667eea, #764ba2); color: white; border-radius: 20px 20px 0 0; border: none;">
+              <h5 class="modal-title" id="addWorkerModalLabel">
+                <i class="bi bi-person-plus me-2"></i>
+                Yangi ishchi qo'shish
+              </h5>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body p-4">
               <form id="addWorkerForm">
                 <div class="row">
                   <div class="col-md-6 mb-3">
-                    <label for="workerName" class="form-label">F.I.O</label>
-                    <input type="text" class="form-control" id="workerName" required />
+                    <label for="workerName" class="form-label fw-bold">F.I.O</label>
+                    <input type="text" class="form-control" id="workerName" required style="border-radius: 10px; border: 2px solid #e9ecef;" />
                   </div>
                   <div class="col-md-6 mb-3">
-                    <label for="workerPosition" class="form-label">Lavozim</label>
-                    <input type="text" class="form-control" id="workerPosition" required />
+                    <label for="workerPosition" class="form-label fw-bold">Lavozim</label>
+                    <input type="text" class="form-control" id="workerPosition" required style="border-radius: 10px; border: 2px solid #e9ecef;" />
                   </div>
                 </div>
                 <div class="row">
                   <div class="col-md-6 mb-3">
-                    <label for="workerMilitaryRank" class="form-label">Harbiy unvon</label>
-                    <input type="text" class="form-control" id="workerMilitaryRank" required />
+                    <label for="workerMilitaryRank" class="form-label fw-bold">Harbiy unvon</label>
+                    <input type="text" class="form-control" id="workerMilitaryRank" required style="border-radius: 10px; border: 2px solid #e9ecef;" />
                   </div>
                   <div class="col-md-6 mb-3">
-                    <label for="workerQKType" class="form-label">QK turi</label>
-                    <select class="form-select" id="workerQKType" required>
+                    <label for="workerQKType" class="form-label fw-bold">QK turi</label>
+                    <select class="form-select" id="workerQKType" required style="border-radius: 10px; border: 2px solid #e9ecef;">
                       <option value="mudofaa">Mudofaa vazirligi</option>
                       <option value="fvv">Favqulodda vaziyatlar vazirligi</option>
                       <option value="dxx">Davlat xavfsizlik xizmati</option>
@@ -150,26 +384,34 @@
                   </div>
                 </div>
                 <div class="mb-3">
-                  <label for="workerImage" class="form-label">Rasm</label>
-                  <input type="file" class="form-control" id="workerImage" accept="image/*" required />
+                  <label for="workerImage" class="form-label fw-bold">Rasm</label>
+                  <input type="file" class="form-control" id="workerImage" accept="image/*" required style="border-radius: 10px; border: 2px solid #e9ecef;" />
                   <div id="imagePreview" class="mt-2 text-center"></div>
                 </div>
               </form>
             </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bekor qilish</button>
-              <button type="button" class="btn btn-primary" onclick="saveNewWorker()">Saqlash</button>
+            <div class="modal-footer" style="border: none; padding: 1rem 1.5rem 1.5rem;">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 20px; padding: 10px 25px;">
+                <i class="bi bi-x-circle me-2"></i>
+                Bekor qilish
+              </button>
+              <button type="button" class="btn btn-primary" onclick="saveNewWorker()" style="border-radius: 20px; padding: 10px 25px; background: linear-gradient(45deg, #667eea, #764ba2); border: none;">
+                <i class="bi bi-check-circle me-2"></i>
+                Saqlash
+              </button>
             </div>
           </div>
         </div>
       </div>
     </main>
 
-    <footer class="footer mt-5 py-3 bg-light">
-      <div class="container text-center">
-        <span class="text-muted">&copy; 2025 Xodimlar Boshqaruvi Tizimi. Barcha huquqlar himoyalangan.</span>
-      </div>
-    </footer>
+    <!-- Footer -->
+    <div style="position: fixed; bottom: 20px; left: 20px; z-index: 1000;">
+      <a href="index.html" class="btn btn-light" style="border-radius: 25px; padding: 10px 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+        <i class="bi bi-house-fill me-2"></i>
+        Bosh sahifa
+      </a>
+    </div>
 
     <script src="assets/packs/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/workers.js"></script>

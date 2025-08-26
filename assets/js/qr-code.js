@@ -1,8 +1,64 @@
 document.addEventListener("DOMContentLoaded", function () {
   const qrResult = document.getElementById("qr-result");
+  const statusIndicator = document.getElementById("statusIndicator");
+  const qrOverlay = document.getElementById("qrOverlay");
+  const scannerPreview = document.getElementById("scannerPreview");
   let html5QrCode = null;
   let isScanning = false;
   let db = null;
+
+  // UI Helper Functions
+  function setStatusIndicator(active) {
+    if (statusIndicator) {
+      statusIndicator.classList.toggle('active', active);
+    }
+  }
+
+  function setScanningState(scanning) {
+    if (qrOverlay) {
+      qrOverlay.classList.toggle('scanning', scanning);
+    }
+    if (scannerPreview) {
+      scannerPreview.classList.toggle('scanning', scanning);
+    }
+  }
+
+  // Enhanced result message function
+  function updateResultMessage(element, text, isSuccess, showSpinner = false) {
+    if (!element) return;
+    
+    // Clear existing content
+    element.innerHTML = '';
+    
+    // Add spinner if needed
+    if (showSpinner) {
+      const spinner = document.createElement('div');
+      spinner.className = 'loading-spinner';
+      element.appendChild(spinner);
+    }
+    
+    // Add text
+    const textNode = document.createTextNode(text);
+    element.appendChild(textNode);
+    
+    if (text) {
+      element.classList.remove("d-none");
+      element.classList.remove("alert-success", "alert-danger", "alert-info", "alert-warning");
+      
+      if (showSpinner) {
+        element.classList.add("alert-info");
+      } else {
+        element.classList.add(isSuccess ? "alert-success" : "alert-danger");
+      }
+      element.style.display = "block";
+    } else {
+      element.classList.add("d-none");
+      element.style.display = "none";
+    }
+    
+    // Update status indicator
+    setStatusIndicator(isSuccess && !showSpinner);
+  }
 
   // IndexedDB ni ishga tushirish
   const request = indexedDB.open("FaceAuthDB", 3);
@@ -31,6 +87,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   async function startScanning() {
     try {
+      updateResultMessage(qrResult, "QR skaner ishga tushirilmoqda...", false, true);
+      
       if (!(await initializeScanner())) {
         return;
       }
@@ -49,21 +107,26 @@ document.addEventListener("DOMContentLoaded", function () {
         onScanSuccess,
         onScanError
       );
+      
       isScanning = true;
-      qrResult.style.display = "block";
-      qrResult.innerHTML = `
-        <div class="alert alert-info">
-          QR kodni kameraga ko'rsating...
-        </div>
-      `;
+      setScanningState(true);
+      setStatusIndicator(false);
+      
+      updateResultMessage(qrResult, "QR kodni kameraga ko'rsating...", true);
     } catch (err) {
       console.error("Asosiy xatolik:", err);
+      setScanningState(false);
+      setStatusIndicator(false);
       showError(getErrorMessage(err));
     }
   }
 
   async function restartScanning() {
     try {
+      updateResultMessage(qrResult, "Qayta ishga tushirilmoqda...", false, true);
+      setScanningState(false);
+      setStatusIndicator(false);
+      
       if (html5QrCode) {
         await html5QrCode.stop();
         html5QrCode = null;
@@ -79,9 +142,17 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       }
 
+      // Hide worker display
+      const workerDisplay = document.getElementById("worker-display");
+      if (workerDisplay) {
+        workerDisplay.style.display = "none";
+      }
+
       await startScanning();
     } catch (err) {
       console.error("Qayta skanerlashda xatolik:", err);
+      setScanningState(false);
+      setStatusIndicator(false);
       showError(getErrorMessage(err));
     }
   }
@@ -141,33 +212,84 @@ document.addEventListener("DOMContentLoaded", function () {
           const employee = request.result;
           console.log(employee);
           if (employee) {
-            // Create worker card HTML
+            // Stop scanning animations
+            setScanningState(false);
+            setStatusIndicator(true);
+            
+            // Update status message
+            updateResultMessage(qrResult, `✅ QR kod muvaffaqiyatli o'qildi! Xush kelibsiz, ${employee.name}!`, true);
+            
+            // Create modern worker card HTML
             const workerCard = `
-              <div class="card worker-card mb-4">
-                <div class="row g-0">
-                  <div class="col-md-4">
-                    <img src="${employee.image}" class="img-fluid rounded-start" alt="${employee.name}">
+              <div class="worker-card-qr">
+                <div class="card-body text-center p-4">
+                  <div class="success-badge-qr mb-3">
+                    <i class="bi bi-qr-code-scan me-2"></i>
+                    QR Kod Tasdiqlandi
                   </div>
-                  <div class="col-md-8">
-                    <div class="card-body">
-                      <h5 class="card-title">F.I.SH:  ${employee.name}</h5>
-                      <p class="card-text mb-1">
-                        <span class="badge bg-primary">Lavozim: ${employee.position}</span>
-                      </p>
-                      <p class="card-text mb-1">
-                        <span class="badge bg-secondary">Harbiy unvon: ${employee.militaryRank}</span>
-                      </p>
-                      <img src="assets/logos/${employee.qkType}.png" width="250" height="250" alt="${employee.qkType}" class="img-fluid qk-logo">
+                  
+                  <img
+                    src="${employee.image}"
+                    class="worker-avatar-qr"
+                    alt="${employee.name}"
+                  />
+                  
+                  <h3 class="card-title mb-3">${employee.name}</h3>
+                  
+                  <div class="row text-center mb-3">
+                    <div class="col-md-6 mb-2">
+                      <div class="badge bg-primary fs-6 p-2">
+                        <i class="bi bi-person-badge me-1"></i>
+                        ${employee.position}
+                      </div>
                     </div>
+                    <div class="col-md-6 mb-2">
+                      <div class="badge bg-success fs-6 p-2">
+                        <i class="bi bi-award me-1"></i>
+                        ${employee.militaryRank}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="d-flex justify-content-center align-items-center">
+                    <img
+                      src="assets/logos/${employee.qkType}.png"
+                      alt="${employee.qkType}"
+                      class="img-fluid"
+                      style="max-width: 80px; max-height: 80px; border-radius: 10px;"
+                    />
+                    <div class="ms-3 text-start">
+                      <small class="text-muted d-block">QK turi</small>
+                      <strong>${employee.qkType}</strong>
+                    </div>
+                  </div>
+                  
+                  <div class="mt-3 text-muted">
+                    <small>
+                      <i class="bi bi-clock me-1"></i>
+                      ${new Date().toLocaleString('uz-UZ')}
+                    </small>
                   </div>
                 </div>
               </div>
             `;
 
             // Show the card
-            const qrResult = document.getElementById("qr-result");
-            qrResult.innerHTML = workerCard;
-            qrResult.style.display = "block";
+            const workerDisplay = document.getElementById("worker-display");
+            workerDisplay.innerHTML = workerCard;
+            workerDisplay.style.display = "block";
+            workerDisplay.classList.add("worker-display");
+            
+            // Show refresh button
+            const refreshButton = document.getElementById("refreshButton");
+            if (refreshButton) {
+              refreshButton.classList.remove("d-none");
+            }
+            
+            resolve({
+              status: "success",
+              message: "Muvaffaqiyatli!",
+            });
           } else {
             resolve({
               status: "error",
@@ -198,43 +320,45 @@ document.addEventListener("DOMContentLoaded", function () {
         await html5QrCode.stop();
         html5QrCode = null;
         isScanning = false;
+        
+        // Stop scanning animation temporarily
+        setScanningState(false);
+        updateResultMessage(qrResult, "QR kod o'qilmoqda...", false, true);
 
         const result = await checkResult(decodedText);
-        qrResult.style.display = "block";
-        qrResult.innerHTML = ` 
-          <div class="card ${
-            result.status === "success" ? "border-success" : "border-danger"
-          }">
-            <div class="card-body">
-              <h5 class="card-title ${
-                result.status === "success" ? "text-success" : "text-danger"
-              }">
-                ${result.status === "success" ? "Muvaffaqiyatli!" : "Xatolik!"}
-              </h5>
-              <p class="card-text">${result.message}</p>
-            </div>
-          </div>
-          <div class="btn-group mb-3">
-            <button id="refreshButton" class="btn btn-primary">
-              <i class="bi bi-arrow-clockwise"></i> Qayta tekshirish
-            </button>
-          </div>
-        `;
+        
+        if (result.status !== "success") {
+          // Show error message if QR code is invalid
+          setScanningState(false);
+          setStatusIndicator(false);
+          updateResultMessage(qrResult, `❌ ${result.message}`, false);
+          
+          // Show refresh button
+          const refreshButton = document.getElementById("refreshButton");
+          if (refreshButton) {
+            refreshButton.classList.remove("d-none");
+          }
+        }
 
-        // Set up the refresh button click handler after creating the button
+        // Set up the refresh button click handler
         const refreshButton = document.getElementById("refreshButton");
         if (refreshButton) {
+          refreshButton.removeEventListener("click", restartScanning); // Remove existing listener
           refreshButton.addEventListener("click", async () => {
             try {
               await restartScanning();
             } catch (err) {
               console.error("Refresh button xatolik:", err);
+              setScanningState(false);
+              setStatusIndicator(false);
               showError(getErrorMessage(err));
             }
           });
         }
       } catch (error) {
         console.error("Kamerani to'xtatishda xatolik:", error);
+        setScanningState(false);
+        setStatusIndicator(false);
         showError("Kamerani to'xtatishda xatolik yuz berdi");
       }
     }
@@ -266,22 +390,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function showError(message) {
     console.error(message);
-    qrResult.style.display = "block";
-    qrResult.innerHTML = `
-      <div class="card border-danger">
-        <div class="card-body">
-          <h5 class="card-title text-danger">Xatolik!</h5>
-          <p class="card-text">${message}</p>
-        </div>
-      </div>
-      <div class="btn-group mb-3">
-        <button id="refreshButton" class="btn btn-primary">
-          <i class="bi bi-arrow-clockwise"></i> Qayta tekshirish
-        </button>
-      </div>
-    `;
+    setScanningState(false);
+    setStatusIndicator(false);
+    updateResultMessage(qrResult, `❌ ${message}`, false);
+    
+    // Show refresh button
+    const refreshButton = document.getElementById("refreshButton");
+    if (refreshButton) {
+      refreshButton.classList.remove("d-none");
+    }
   }
 
+  // Set initial UI state
+  setScanningState(false);
+  setStatusIndicator(false);
+  updateResultMessage(qrResult, "QR skaner yuklanmoqda...", false, true);
+  
   // Avtomatik skanerlashni boshlash
   startScanning();
   setupRefreshButton();
