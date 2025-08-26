@@ -413,7 +413,7 @@ async function startFaceAuthentication() {
           
           updateResultMessage(
             faceResult,
-            `✅ Autentifikatsiya muvaffaqiyatli! Xush kelibsiz, ${worker.name}!`,
+            `Autentifikatsiya muvaffaqiyatli! Xush kelibsiz, ${worker.name}!`,
             true
           );
           
@@ -422,7 +422,7 @@ async function startFaceAuthentication() {
               <div class="card-body text-center p-4">
                 <div class="success-badge mb-3">
                   <i class="bi bi-check-circle-fill me-2"></i>
-                  Tasdiqlandi • ${matchPercentage}% moslik
+                  Tasdiqlandi - ${matchPercentage}% moslik
                 </div>
                 
                 <img
